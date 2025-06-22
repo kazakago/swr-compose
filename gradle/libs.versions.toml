@@ -30,7 +30,7 @@ konnection = "dev.tmapps:konnection:1.4.2"
 # MockK
 mockk = "io.mockk:mockk:1.13.12"
 # Robolectric
-robolectric = "org.robolectric:robolectric:4.13"
+robolectric = "org.robolectric:robolectric:4.15.1"
 
 [plugins]
 # Kotlin
