@@ -1,50 +1,47 @@
 [versions]
-version = "0.7.1"
-
-compileSdk = "34"
-minSdk = "21"
-targetSdk = "34"
-
-kotlin = "2.0.20"
-coroutines = "1.9.0"
-compose-ui = "1.7.2"
-android-plugin = "8.6.1"
+kotlin = "2.2.0"
+kotlinx-coroutines = "1.10.2"
+kotlinx-serialization = "1.9.0"
+kotlinx-browser = "0.3"
+kotlinx-datetime = "0.7.0"
+androidx-lifecycle = "2.9.1"
+androidx-navigation = "2.9.0-beta03"
+androidx-startup = "1.2.0"
+androidx-activity = "1.10.1"
+compose = "1.8.2"
+material-icons = "1.7.3"
+turbine = "1.2.1"
+dokka = "2.0.0"
+jvmToolchain = "11"
+android-plugin = "8.10.0" # https://kotlinlang.org/docs/multiplatform-compatibility-guide.html#version-compatibility
+android-compileSdk = "36"
+android-minSdk = "23"
+android-targetSdk = "36"
 
 [libraries]
-# Kotlinx Coroutines
-kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }
-kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
-# Kotlinx DateTime
-kotlinx-datetime = "org.jetbrains.kotlinx:kotlinx-datetime:0.6.1"
-# AndroidX Compose UI Test
-androidx-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "compose-ui" }
-androidx-compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "compose-ui" }
-# AndroidX Activity Compose
-androidx-activity-compose = "androidx.activity:activity-compose:1.9.2"
-# AndroidX Navigation Compose
-androidx-navigation-compose = "org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha10"
-# AndroidX Lifecycle Runtime
-androidx-lifecycle-runtime = "androidx.lifecycle:lifecycle-runtime:2.8.6"
-# Konnection
-konnection = "dev.tmapps:konnection:1.4.2"
-# MockK
-mockk = "io.mockk:mockk:1.13.12"
-# Robolectric
-robolectric = "org.robolectric:robolectric:4.13"
+kotlin-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "kotlinx-coroutines" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
+kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
+kotlinx-browser = { module = "org.jetbrains.kotlinx:kotlinx-browser", version.ref = "kotlinx-browser" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
+dokka-plugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
+material-icons-core = { module = "org.jetbrains.compose.material:material-icons-core", version.ref = "material-icons" }
+androidx-lifecycle-runtime = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-runtime-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
+androidx-startup = { module = "androidx.startup:startup-runtime", version.ref = "androidx-startup" }
+androidx-navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "androidx-navigation" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
+turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 
 [plugins]
-# Kotlin
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" } # https://kotlinlang.org/docs/multiplatform-compatibility-guide.html#version-compatibility
-# Compose
-compose = { id = "org.jetbrains.compose", version = "1.6.11" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
-# Dokka
-dokka = { id = "org.jetbrains.dokka", version = "1.9.20" }
-# Android
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 android-application = { id = "com.android.application", version.ref = "android-plugin" }
 android-library = { id = "com.android.library", version.ref = "android-plugin" }
-# Nexus Publish
-nexus-publish = { id = "io.github.gradle-nexus.publish-plugin", version = "2.0.0" }
-# Binary Compatibility Validator
-binary-compatibility-validator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version = "0.16.3" }
+buildlogic-publish = { id = "buildlogic.publish", version = "unspecified" }
