@@ -3,6 +3,7 @@ package com.kazakago.swr.runtime.internal
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
+import com.kazakago.swr.runtime.DedupingIntervalException
 import com.kazakago.swr.runtime.SWRConfig
 import com.kazakago.swr.runtime.SWRValidateOptions
 import com.kazakago.swr.store.GettingFrom
@@ -28,6 +29,7 @@ internal class SWRInternal<KEY : Any, DATA>(
 ) {
     private val networkMonitor = buildNetworkMonitor()
     private val retryingJobs = mutableSetOf<Job>()
+    private var dedupingIntervalJob: Job? = null
 
     init {
         when (config.revalidateOnMount) {
@@ -84,6 +86,12 @@ internal class SWRInternal<KEY : Any, DATA>(
     }
 
     suspend fun validate(options: SWRValidateOptions? = null): Result<DATA> {
+        if (dedupingIntervalJob?.isActive == true) {
+            return Result.failure(DedupingIntervalException())
+        }
+        dedupingIntervalJob = scope.launch {
+            delay(config.dedupingInterval)
+        }
         val loadingTimeoutJob = scope.launch {
             delay(config.loadingTimeout)
             config.onLoadingSlow?.invoke()

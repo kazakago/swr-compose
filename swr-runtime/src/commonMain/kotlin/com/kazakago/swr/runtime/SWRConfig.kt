@@ -14,6 +14,7 @@ public class SWRConfig<KEY : Any, DATA>(
     public var refreshWhenHidden: Boolean = false,
     public var refreshWhenOffline: Boolean = false,
     public var shouldRetryOnError: Boolean = true,
+    public var dedupingInterval: Duration = 2.seconds,
     public var focusThrottleInterval: Duration = 5.seconds,
     public var loadingTimeout: Duration = 3.seconds,
     public var errorRetryInterval: Duration = 5.seconds,
