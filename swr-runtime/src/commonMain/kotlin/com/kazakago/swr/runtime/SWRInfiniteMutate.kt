@@ -41,7 +41,7 @@ public data class SWRInfiniteMutate<DATA>(
         return runCatching {
             if (data != null) data() else null
         }.onSuccess { newDataList ->
-            if (newDataList != null) {
+            if (currentConfig.populateCache && newDataList != null) {
                 coroutineScope {
                     buildList {
                         repeat(pageSize) { pageIndex ->

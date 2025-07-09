@@ -21,7 +21,7 @@ public data class SWRMutate<DATA>(
         return runCatching {
             if (data != null) data() else null
         }.onSuccess { newData ->
-            if (newData != null) {
+            if (currentConfig.populateCache && newData != null) {
                 update(newData)
             }
             if (currentConfig.revalidate) {
