@@ -25,6 +25,8 @@ import com.kazakago.swr.example.basic.DataFetchingRoute
 import com.kazakago.swr.example.basic.DataFetchingScreen
 import com.kazakago.swr.example.basic.ErrorHandlingRoute
 import com.kazakago.swr.example.basic.ErrorHandlingScreen
+import com.kazakago.swr.example.basic.GlobalConfigurationRoute
+import com.kazakago.swr.example.basic.GlobalConfigurationScreen
 import com.kazakago.swr.example.basic.InfinitePaginationRoute
 import com.kazakago.swr.example.basic.InfinitePaginationScreen
 import com.kazakago.swr.example.basic.PaginationRoute
@@ -64,7 +66,7 @@ fun App(
                         mockServer = mockServer,
                         isClearCache = isClearCache,
                         moveToDataFetching = { navController.navigate(DataFetchingRoute) },
-                        moveToGlobalConfiguration = {},
+                        moveToGlobalConfiguration = { navController.navigate(GlobalConfigurationRoute) },
                         moveToErrorHandling = { navController.navigate(ErrorHandlingRoute) },
                         moveToAutoRevalidation = { navController.navigate(AutoRevalidationRoute) },
                         moveToConditionalFetching = { navController.navigate(ConditionalFetchingRoute) },
@@ -81,11 +83,15 @@ fun App(
                         onBack = navController::popBackStack,
                     )
                 }
-//                composable("global_configuration") {
-//                    GlobalConfigurationScreen(navController)
-//                }
+                composable<GlobalConfigurationRoute> {
+                    GlobalConfigurationScreen(
+                        onBack = navController::popBackStack,
+                    )
+                }
                 composable<ErrorHandlingRoute> {
-                    ErrorHandlingScreen(navController)
+                    ErrorHandlingScreen(
+                        onBack = navController::popBackStack,
+                    )
                 }
                 composable<AutoRevalidationRoute> {
                     AutoRevalidationScreen(
@@ -103,7 +109,9 @@ fun App(
                     )
                 }
 //                composable("mutation") {
-//                    MutationScreen(navController)
+//                    MutationScreen(
+//                        onBack = navController::popBackStack,
+//                    )
 //                }
                 composable<ToDoListRoute> {
                     ToDoListScreen(
@@ -121,10 +129,16 @@ fun App(
                     )
                 }
 //                composable("prefetching") {
-//                    PrefetchingScreen(navController, scope)
+//                    PrefetchingScreen(
+//                        onBack = navController::popBackStack,
+//                        scope = scope,
+//                    )
 //                }
 //                composable("prefetching_next") {
-//                    PrefetchingNextScreen(navController, scope)
+//                    PrefetchingNextScreen(
+//                        onBack = navController::popBackStack,
+//                        scope = scope,
+//                    )
 //                }
             }
         }

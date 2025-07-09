@@ -18,7 +18,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
 import com.kazakago.swr.compose.rememberSWR
 import com.kazakago.swr.example.ui.ErrorContent
 import com.kazakago.swr.example.ui.LoadingContent
@@ -37,7 +36,9 @@ data object ErrorHandlingRoute
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun ErrorHandlingScreen(navController: NavController) {
+fun ErrorHandlingScreen(
+    onBack: () -> Unit,
+) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val (data, error, _, mutate) = rememberSWR(key = "/error_handling", fetcher = fetcher) {
@@ -57,7 +58,7 @@ fun ErrorHandlingScreen(navController: NavController) {
             TopAppBar(
                 title = { Text("Error Handling") },
                 navigationIcon = {
-                    IconButton(onClick = navController::popBackStack) {
+                    IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
                     }
                 },
