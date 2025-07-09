@@ -29,6 +29,8 @@ import com.kazakago.swr.example.basic.GlobalConfigurationRoute
 import com.kazakago.swr.example.basic.GlobalConfigurationScreen
 import com.kazakago.swr.example.basic.InfinitePaginationRoute
 import com.kazakago.swr.example.basic.InfinitePaginationScreen
+import com.kazakago.swr.example.basic.MutationRoute
+import com.kazakago.swr.example.basic.MutationScreen
 import com.kazakago.swr.example.basic.PaginationRoute
 import com.kazakago.swr.example.basic.PaginationScreen
 import com.kazakago.swr.example.todolist.ToDoListRoute
@@ -71,7 +73,7 @@ fun App(
                         moveToAutoRevalidation = { navController.navigate(AutoRevalidationRoute) },
                         moveToConditionalFetching = { navController.navigate(ConditionalFetchingRoute) },
                         moveToArguments = { navController.navigate(ArgumentsRoute) },
-                        moveToMutation = {},
+                        moveToMutation = { navController.navigate(MutationRoute) },
                         moveToPagination = { navController.navigate(PaginationRoute) },
                         moveToInfinitePagination = { navController.navigate(InfinitePaginationRoute) },
                         moveToPrefetching = {},
@@ -108,11 +110,11 @@ fun App(
                         onBack = navController::popBackStack,
                     )
                 }
-//                composable("mutation") {
-//                    MutationScreen(
-//                        onBack = navController::popBackStack,
-//                    )
-//                }
+                composable<MutationRoute> {
+                    MutationScreen(
+                        onBack = navController::popBackStack,
+                    )
+                }
                 composable<ToDoListRoute> {
                     ToDoListScreen(
                         onBack = navController::popBackStack,
