@@ -17,6 +17,7 @@ android-plugin = "8.10.0" # https://kotlinlang.org/docs/multiplatform-compatibil
 android-compileSdk = "36"
 android-minSdk = "23"
 android-targetSdk = "36"
+maven-publish = "0.33.0"
 
 [libraries]
 kotlin-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -35,6 +36,7 @@ androidx-startup = { module = "androidx.startup:startup-runtime", version.ref = 
 androidx-navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "androidx-navigation" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
+maven-publish-plugin = { module = "com.vanniktech.maven.publish:com.vanniktech.maven.publish.gradle.plugin", version.ref = "maven-publish" }
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -44,4 +46,5 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 android-application = { id = "com.android.application", version.ref = "android-plugin" }
 android-library = { id = "com.android.library", version.ref = "android-plugin" }
+maven-publish = {id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
 buildlogic-publish = { id = "buildlogic.publish", version = "unspecified" }

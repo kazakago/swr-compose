@@ -8,6 +8,7 @@ dependencyResolutionManagement {
             }
         }
         mavenCentral()
+        gradlePluginPortal()
     }
     versionCatalogs {
         create("libs") {
