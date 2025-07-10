@@ -12,8 +12,8 @@ mavenPublishing {
     )
     pom {
         name.set("swr-compose")
-        description.set("\"React SWR\" ported for Compose Multiplatform")
-        inceptionYear.set("2020")
+        description.set("\"React SWR\" ported for Jetpack Compose & Compose Multiplatform")
+        inceptionYear.set("2022")
         url.set("https://github.com/kazakago/swr-compose")
         licenses {
             license {
