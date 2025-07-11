@@ -3,14 +3,11 @@ package com.kazakago.swr.runtime.internal
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
-import com.kazakago.swr.runtime.DedupingIntervalException
 import com.kazakago.swr.runtime.SWRConfig
-import com.kazakago.swr.runtime.SWRValidateOptions
 import com.kazakago.swr.store.GettingFrom
 import com.kazakago.swr.store.SWRStore
 import com.kazakago.swr.store.SWRStoreState
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -28,8 +25,7 @@ internal class SWRInternal<KEY : Any, DATA>(
     private val config: SWRConfig<KEY, DATA>,
 ) {
     private val networkMonitor = buildNetworkMonitor()
-    private val retryingJobs = mutableSetOf<Job>()
-    private var dedupingIntervalJob: Job? = null
+    val validate = SWRValidate(store, scope, config)
 
     init {
         when (config.revalidateOnMount) {
@@ -83,48 +79,6 @@ internal class SWRInternal<KEY : Any, DATA>(
                 }
             }
         }
-    }
-
-    suspend fun validate(options: SWRValidateOptions? = null): Result<DATA> {
-        if (dedupingIntervalJob?.isActive == true) {
-            return Result.failure(DedupingIntervalException())
-        }
-        dedupingIntervalJob = scope.launch {
-            delay(config.dedupingInterval)
-        }
-        val loadingTimeoutJob = scope.launch {
-            delay(config.loadingTimeout)
-            config.onLoadingSlow?.invoke()
-        }
-        return store.validate()
-            .onSuccess { data ->
-                loadingTimeoutJob.cancel()
-                retryingJobs.clear()
-                config.onSuccess?.invoke(data, store.key, config)
-            }
-            .onFailure { error ->
-                loadingTimeoutJob.cancel()
-                config.onError?.invoke(error, store.key, config)
-                if (config.shouldRetryOnError) {
-                    val revalidateOptions = createValidateOptions(options?.retryCount ?: 0)
-                    retryingJobs += scope.launch {
-                        config.onErrorRetry(
-                            error,
-                            store.key,
-                            config,
-                            ::validate,
-                            revalidateOptions,
-                        )
-                    }
-                }
-            }
-    }
-
-    private fun createValidateOptions(currentRetryCount: Int): SWRValidateOptions {
-        return SWRValidateOptions(
-            retryCount = currentRetryCount + 1,
-            dedupe = (0 == currentRetryCount) && retryingJobs.any { it.isActive },
-        )
     }
 
     val stateFlow: StateFlow<SWRStoreState<DATA>> = store.flow

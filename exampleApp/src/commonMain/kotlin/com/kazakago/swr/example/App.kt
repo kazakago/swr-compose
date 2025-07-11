@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -33,6 +34,10 @@ import com.kazakago.swr.example.basic.MutationRoute
 import com.kazakago.swr.example.basic.MutationScreen
 import com.kazakago.swr.example.basic.PaginationRoute
 import com.kazakago.swr.example.basic.PaginationScreen
+import com.kazakago.swr.example.basic.PrefetchingNextRoute
+import com.kazakago.swr.example.basic.PrefetchingNextScreen
+import com.kazakago.swr.example.basic.PrefetchingRoute
+import com.kazakago.swr.example.basic.PrefetchingScreen
 import com.kazakago.swr.example.todolist.ToDoListRoute
 import com.kazakago.swr.example.todolist.ToDoListScreen
 import com.kazakago.swr.example.todolist.server.LocalMockServer
@@ -44,6 +49,7 @@ fun App(
     navController: NavHostController = rememberNavController(),
 ) {
     MaterialTheme {
+        val scope = rememberCoroutineScope()
         val mockServer = remember { mutableStateOf<MockServer>(MockServerSucceed) }
         val isClearCache = remember { mutableStateOf(true) }
         CompositionLocalProvider(LocalMockServer provides mockServer.value) {
@@ -76,7 +82,7 @@ fun App(
                         moveToMutation = { navController.navigate(MutationRoute) },
                         moveToPagination = { navController.navigate(PaginationRoute) },
                         moveToInfinitePagination = { navController.navigate(InfinitePaginationRoute) },
-                        moveToPrefetching = {},
+                        moveToPrefetching = { navController.navigate(PrefetchingRoute) },
                         moveToTodoList = { navController.navigate(ToDoListRoute) },
                     )
                 }
@@ -130,18 +136,19 @@ fun App(
                         onBack = navController::popBackStack,
                     )
                 }
-//                composable("prefetching") {
-//                    PrefetchingScreen(
-//                        onBack = navController::popBackStack,
-//                        scope = scope,
-//                    )
-//                }
-//                composable("prefetching_next") {
-//                    PrefetchingNextScreen(
-//                        onBack = navController::popBackStack,
-//                        scope = scope,
-//                    )
-//                }
+                composable<PrefetchingRoute> {
+                    PrefetchingScreen(
+                        onBack = navController::popBackStack,
+                        toNext = { navController.navigate(PrefetchingNextRoute) },
+                        scope = scope,
+                    )
+                }
+                composable<PrefetchingNextRoute> {
+                    PrefetchingNextScreen(
+                        onBack = navController::popBackStack,
+                        scope = scope,
+                    )
+                }
             }
         }
     }

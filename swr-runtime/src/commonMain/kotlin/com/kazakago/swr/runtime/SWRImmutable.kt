@@ -42,7 +42,7 @@ public class SWRImmutable<KEY : Any, DATA>(
     public val mutate: SWRMutate<DATA> = if (swrInternal != null) {
         SWRMutate(
             get = swrInternal.store::get,
-            validate = swrInternal::validate,
+            validate = { swrInternal.validate() },
             update = swrInternal.store::update,
         )
     } else {
