@@ -34,6 +34,8 @@ kotlin {
         commonTest.dependencies {
             implementation(libs.kotlin.test)
             implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.androidx.lifecycle.runtime.testing)
+            implementation(libs.turbine)
         }
         androidMain.dependencies {
             implementation(libs.androidx.startup)
