@@ -15,12 +15,8 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value=":swr-store:cleanTest" />
-          <option value=":swr-runtime:cleanTest" />
-          <option value=":swr-compose:cleanTest" />
-          <option value=":swr-store:test" />
-          <option value=":swr-runtime:test" />
-          <option value=":swr-compose:test" />
+          <option value="cleanAllTests" />
+          <option value="allTests" />
         </list>
       </option>
       <option name="vmOptions" />
