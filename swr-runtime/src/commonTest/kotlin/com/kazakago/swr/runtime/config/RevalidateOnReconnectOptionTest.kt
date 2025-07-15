@@ -1,7 +1,8 @@
-package com.kazakago.swr.runtime
+package com.kazakago.swr.runtime.config
 
 import androidx.lifecycle.testing.TestLifecycleOwner
 import app.cash.turbine.test
+import com.kazakago.swr.runtime.SWR
 import com.kazakago.swr.runtime.internal.TestNetworkMonitor
 import com.kazakago.swr.store.SWRStoreState
 import com.kazakago.swr.store.cache.SWRCacheOwner
@@ -19,7 +20,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class SWRTest {
+class RevalidateOnReconnectOptionTest {
 
     @BeforeTest
     fun setUp() {
@@ -32,7 +33,8 @@ class SWRTest {
     }
 
     @Test
-    fun validate() = runTest {
+    fun withRevalidateOnReconnect() = runTest {
+        val networkMonitor = TestNetworkMonitor()
         val swr = SWR(
             key = "key",
             fetcher = {
@@ -42,37 +44,51 @@ class SWRTest {
             lifecycleOwner = TestLifecycleOwner(),
             scope = backgroundScope,
             cacheOwner = SWRCacheOwner(),
-            networkMonitor = TestNetworkMonitor(),
-        )
+            networkMonitor = networkMonitor,
+        ) {
+            revalidateOnReconnect = true
+        }
         swr.stateFlow.test {
-            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
-            advanceTimeBy(100)
-            expectNoEvents()
+            advanceTimeBy(2500)
+            skipItems(2)
+
+            networkMonitor.onlineStatus.value = false
             advanceTimeBy(1)
+            networkMonitor.onlineStatus.value = true
+            advanceTimeBy(1)
+            assertEquals(SWRStoreState.Loading("data"), expectMostRecentItem())
+            advanceTimeBy(2500)
             assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
         }
     }
 
     @Test
-    fun validateFailed() = runTest {
-        val error = IllegalStateException()
+    fun noRevalidateOnReconnect() = runTest {
+        val networkMonitor = TestNetworkMonitor()
         val swr = SWR(
             key = "key",
             fetcher = {
                 delay(100)
-                throw error
+                "data"
             },
             lifecycleOwner = TestLifecycleOwner(),
             scope = backgroundScope,
             cacheOwner = SWRCacheOwner(),
-            networkMonitor = TestNetworkMonitor(),
-        )
+            networkMonitor = networkMonitor,
+        ) {
+            revalidateOnReconnect = false
+        }
         swr.stateFlow.test {
-            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
-            advanceTimeBy(100)
-            expectNoEvents()
+            advanceTimeBy(2500)
+            skipItems(2)
+
+            networkMonitor.onlineStatus.value = false
             advanceTimeBy(1)
-            assertEquals(SWRStoreState.Error(null, error), expectMostRecentItem())
+            networkMonitor.onlineStatus.value = true
+            advanceTimeBy(1)
+            expectNoEvents()
+            advanceTimeBy(2500)
+            expectNoEvents()
         }
     }
 }

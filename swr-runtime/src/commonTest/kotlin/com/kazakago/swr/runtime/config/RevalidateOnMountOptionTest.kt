@@ -1,7 +1,8 @@
-package com.kazakago.swr.runtime
+package com.kazakago.swr.runtime.config
 
 import androidx.lifecycle.testing.TestLifecycleOwner
 import app.cash.turbine.test
+import com.kazakago.swr.runtime.SWR
 import com.kazakago.swr.runtime.internal.TestNetworkMonitor
 import com.kazakago.swr.store.SWRStoreState
 import com.kazakago.swr.store.cache.SWRCacheOwner
@@ -19,7 +20,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class SWRTest {
+class RevalidateOnMountOptionTest {
 
     @BeforeTest
     fun setUp() {
@@ -32,7 +33,7 @@ class SWRTest {
     }
 
     @Test
-    fun validate() = runTest {
+    fun withRevalidateOnMount() = runTest {
         val swr = SWR(
             key = "key",
             fetcher = {
@@ -43,36 +44,37 @@ class SWRTest {
             scope = backgroundScope,
             cacheOwner = SWRCacheOwner(),
             networkMonitor = TestNetworkMonitor(),
-        )
+        ) {
+            revalidateOnMount = true
+        }
         swr.stateFlow.test {
-            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
-            advanceTimeBy(100)
-            expectNoEvents()
-            advanceTimeBy(1)
+            skipItems(1)
+
+            advanceTimeBy(2500)
             assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
         }
     }
 
     @Test
-    fun validateFailed() = runTest {
-        val error = IllegalStateException()
+    fun noRevalidateOnMount() = runTest {
         val swr = SWR(
             key = "key",
             fetcher = {
                 delay(100)
-                throw error
+                "data"
             },
             lifecycleOwner = TestLifecycleOwner(),
             scope = backgroundScope,
             cacheOwner = SWRCacheOwner(),
             networkMonitor = TestNetworkMonitor(),
-        )
+        ) {
+            revalidateOnMount = false
+        }
         swr.stateFlow.test {
-            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
-            advanceTimeBy(100)
+            skipItems(1)
+
+            advanceTimeBy(2500)
             expectNoEvents()
-            advanceTimeBy(1)
-            assertEquals(SWRStoreState.Error(null, error), expectMostRecentItem())
         }
     }
 }

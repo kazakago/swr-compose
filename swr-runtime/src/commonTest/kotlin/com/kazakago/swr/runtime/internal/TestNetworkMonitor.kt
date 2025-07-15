@@ -1,9 +1,12 @@
 package com.kazakago.swr.runtime.internal
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.drop
 
 data class TestNetworkMonitor(
-    override val isOnline: Boolean = true,
-    override val onlineStatusFlow: Flow<Boolean> = flowOf(),
-) : NetworkMonitor
+    val onlineStatus: MutableStateFlow<Boolean> = MutableStateFlow(true),
+) : NetworkMonitor {
+    override val isOnline: Boolean = onlineStatus.value
+    override val onlineStatusFlow: Flow<Boolean> = onlineStatus.drop(1)
+}
