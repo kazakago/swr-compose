@@ -1,8 +1,8 @@
 # SWR for Compose
 
-[![Maven Central](https://img.shields.io/maven-central/v/com.kazakago.swr.compose/swr.svg)](https://central.sonatype.com/namespace/com.kazakago.swr.compose)
-[![javadoc](https://javadoc.io/badge2/com.kazakago.swr.compose/swr/javadoc.svg)](https://javadoc.io/doc/com.kazakago.swr.compose/swr)
-[![Check](https://github.com/KazaKago/swr-compose/actions/workflows/check.yml/badge.svg?branch=main)](https://github.com/KazaKago/swr-compose/actions/workflows/check.yml?query=branch%3Amain)
+[![Maven Central](https://img.shields.io/maven-central/v/com.kazakago.swr/swr-compose.svg)](https://central.sonatype.com/namespace/com.kazakago.swr.compose)
+[![javadoc](https://javadoc.io/badge2/com.kazakago.swr/swr-compose/javadoc.svg)](https://javadoc.io/doc/com.kazakago.swr/swr-compose)
+[![Check](https://github.com/kazakago/swr-compose/actions/workflows/check.yml/badge.svg?branch=main)](https://github.com/kazakago/swr-compose/actions/workflows/check.yml?query=branch%3Amain)
 [![License](https://img.shields.io/github/license/kazakago/swr-compose.svg)](LICENSE)
 
 This library is inspired by [React SWR](https://swr.vercel.app) ported for [Jetpack Compose](https://developer.android.com/jetpack/compose) and [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/).  
@@ -19,10 +19,10 @@ According to `React SWR`, "SWR" refers to
 
 ## Install
 
-Add the following gradle dependency exchanging `*.*.*` for the latest release. [![Maven Central](https://img.shields.io/maven-central/v/com.kazakago.swr.compose/swr.svg)](https://central.sonatype.com/namespace/com.kazakago.swr.compose)
+Add the following gradle dependency exchanging `*.*.*` for the latest release. [![Maven Central](https://img.shields.io/maven-central/v/com.kazakago.swr/swr-compose.svg)](https://central.sonatype.com/namespace/com.kazakago.swr)
 
 ```kotlin
-implementation("com.kazakago.swr.compose:swr-compose:*.*.*")
+implementation("com.kazakago.swr:swr-compose:*.*.*")
 ```
 
 ## Getting Started
