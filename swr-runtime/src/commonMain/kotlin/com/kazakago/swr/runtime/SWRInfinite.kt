@@ -1,7 +1,10 @@
 package com.kazakago.swr.runtime
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LifecycleOwner
+import com.kazakago.swr.runtime.internal.NetworkMonitor
 import com.kazakago.swr.runtime.internal.SWRInternal
+import com.kazakago.swr.runtime.internal.buildNetworkMonitor
 import com.kazakago.swr.store.GettingFrom
 import com.kazakago.swr.store.SWRStore
 import com.kazakago.swr.store.SWRStoreState
@@ -24,6 +27,7 @@ public class SWRInfinite<KEY : Any, DATA>(
     scope: CoroutineScope,
     persister: Persister<KEY, DATA>? = null,
     cacheOwner: SWRCacheOwner = defaultSWRCacheOwner,
+    @VisibleForTesting networkMonitor: NetworkMonitor = buildNetworkMonitor(),
     defaultConfig: SWRConfig<Any, Any> = defaultSWRConfig,
     config: SWRConfig<KEY, DATA>.() -> Unit = {},
 ) {
@@ -56,7 +60,7 @@ public class SWRInfinite<KEY : Any, DATA>(
                         if (key != null) {
                             val store = SWRStore(key, fetcher, persister, cacheOwner)
                             previousPageData = store.get(from = GettingFrom.LocalOnly).getOrNull()
-                            add(SWRInternal(store, lifecycleOwner, scope, currentConfig))
+                            add(SWRInternal(store, lifecycleOwner, scope, networkMonitor, currentConfig))
                         } else {
                             add(null)
                         }

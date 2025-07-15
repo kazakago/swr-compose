@@ -13,9 +13,9 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
 
-internal actual fun buildNetworkMonitor(): NetworkMonitor = NetworkMonitorImpl(applicationContext)
+public actual fun buildNetworkMonitor(): NetworkMonitor = NetworkMonitorImpl(applicationContext)
 
-internal class NetworkMonitorImpl(context: Context) : NetworkMonitor {
+private class NetworkMonitorImpl(context: Context) : NetworkMonitor {
 
     private val connectivityManager = context.getSystemService(ConnectivityManager::class.java)
     override val isOnline: Boolean

@@ -1,7 +1,10 @@
 package com.kazakago.swr.runtime
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LifecycleOwner
+import com.kazakago.swr.runtime.internal.NetworkMonitor
 import com.kazakago.swr.runtime.internal.SWRInternal
+import com.kazakago.swr.runtime.internal.buildNetworkMonitor
 import com.kazakago.swr.store.SWRStore
 import com.kazakago.swr.store.SWRStoreState
 import com.kazakago.swr.store.cache.SWRCacheOwner
@@ -18,6 +21,7 @@ public class SWRImmutable<KEY : Any, DATA>(
     scope: CoroutineScope,
     persister: Persister<KEY, DATA>? = null,
     cacheOwner: SWRCacheOwner = defaultSWRCacheOwner,
+    @VisibleForTesting networkMonitor: NetworkMonitor = buildNetworkMonitor(),
     defaultConfig: SWRConfig<Any, Any> = defaultSWRConfig,
     config: SWRConfig<KEY, DATA>.() -> Unit = {},
 ) {
@@ -26,6 +30,7 @@ public class SWRImmutable<KEY : Any, DATA>(
             store = SWRStore(key, fetcher, persister, cacheOwner),
             lifecycleOwner = lifecycleOwner,
             scope = scope,
+            networkMonitor = networkMonitor,
             config = SWRConfig<KEY, DATA>(defaultConfig).apply {
                 config()
                 revalidateIfStale = false

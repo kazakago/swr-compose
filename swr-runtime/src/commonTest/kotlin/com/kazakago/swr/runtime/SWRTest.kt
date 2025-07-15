@@ -2,6 +2,7 @@ package com.kazakago.swr.runtime
 
 import androidx.lifecycle.testing.TestLifecycleOwner
 import app.cash.turbine.test
+import com.kazakago.swr.runtime.internal.TestNetworkMonitor
 import com.kazakago.swr.store.SWRStoreState
 import com.kazakago.swr.store.cache.SWRCacheOwner
 import kotlinx.coroutines.Dispatchers
@@ -20,13 +21,9 @@ import kotlin.test.assertEquals
 @OptIn(ExperimentalCoroutinesApi::class)
 class SWRTest {
 
-    private val testDispatcher = StandardTestDispatcher()
-    private lateinit var lifecycleOwner: TestLifecycleOwner
-
     @BeforeTest
     fun setUp() {
-        Dispatchers.setMain(testDispatcher)
-        lifecycleOwner = TestLifecycleOwner()
+        Dispatchers.setMain(StandardTestDispatcher())
     }
 
     @AfterTest
@@ -42,9 +39,10 @@ class SWRTest {
                 delay(100)
                 "data"
             },
-            lifecycleOwner = lifecycleOwner,
+            lifecycleOwner = TestLifecycleOwner(),
             scope = backgroundScope,
             cacheOwner = SWRCacheOwner(),
+            networkMonitor = TestNetworkMonitor(),
         )
         swr.stateFlow.test {
             expectMostRecentItem().apply {
@@ -68,9 +66,10 @@ class SWRTest {
                 delay(100)
                 throw error
             },
-            lifecycleOwner = lifecycleOwner,
+            lifecycleOwner = TestLifecycleOwner(),
             scope = backgroundScope,
             cacheOwner = SWRCacheOwner(),
+            networkMonitor = TestNetworkMonitor(),
         )
         swr.stateFlow.test {
             expectMostRecentItem().apply {

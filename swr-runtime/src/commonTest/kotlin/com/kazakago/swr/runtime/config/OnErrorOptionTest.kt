@@ -1,7 +1,9 @@
-package com.kazakago.swr.runtime
+package com.kazakago.swr.runtime.config
 
 import androidx.lifecycle.testing.TestLifecycleOwner
 import app.cash.turbine.test
+import com.kazakago.swr.runtime.SWR
+import com.kazakago.swr.runtime.internal.TestNetworkMonitor
 import com.kazakago.swr.store.cache.SWRCacheOwner
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -19,13 +21,9 @@ import kotlin.test.fail
 @OptIn(ExperimentalCoroutinesApi::class)
 class OnErrorOptionTest {
 
-    private val testDispatcher = StandardTestDispatcher()
-    private lateinit var lifecycleOwner: TestLifecycleOwner
-
     @BeforeTest
     fun setUp() {
-        Dispatchers.setMain(testDispatcher)
-        lifecycleOwner = TestLifecycleOwner()
+        Dispatchers.setMain(StandardTestDispatcher())
     }
 
     @AfterTest
@@ -43,9 +41,10 @@ class OnErrorOptionTest {
                 delay(100)
                 throw error
             },
-            lifecycleOwner = lifecycleOwner,
+            lifecycleOwner = TestLifecycleOwner(),
             scope = backgroundScope,
             cacheOwner = SWRCacheOwner(),
+            networkMonitor = TestNetworkMonitor(),
         ) {
             onSuccess = { _, _, _ ->
                 fail("Must not reach here")

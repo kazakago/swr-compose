@@ -18,9 +18,9 @@ import platform.Network.nw_path_t
 import platform.darwin.dispatch_get_global_queue
 import platform.posix.QOS_CLASS_BACKGROUND
 
-internal actual fun buildNetworkMonitor(): NetworkMonitor = NetworkMonitorImpl()
+public actual fun buildNetworkMonitor(): NetworkMonitor = NetworkMonitorImpl()
 
-internal class NetworkMonitorImpl : NetworkMonitor {
+private class NetworkMonitorImpl : NetworkMonitor {
 
     private var path: nw_path_t? = null
     override val isOnline: Boolean = isConnected(path)

@@ -56,7 +56,10 @@ fun ToDoListScreen(
     val openToDoCreationDialog = remember { mutableStateOf(false) }
     val openToDoEditingDialog = remember { mutableStateOf<Pair<Int, String>?>(null) }
 
-    val (todoList, error, isLoading, mutate) = rememberSWR("/get_todos/$mockServer", { mockServer.getToDoList() }) {
+    val (todoList, error, isLoading, mutate) = rememberSWR(
+        key = "/get_todos/$mockServer",
+        fetcher = { mockServer.getToDoList() },
+    ) {
         onLoadingSlow = {
             scope.launch {
                 snackbarHostState.showSnackbar("Loading is slow, Please wait..")

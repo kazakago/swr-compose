@@ -22,9 +22,9 @@ internal class SWRInternal<KEY : Any, DATA>(
     val store: SWRStore<KEY, DATA>,
     lifecycleOwner: LifecycleOwner,
     private val scope: CoroutineScope,
+    private val networkMonitor: NetworkMonitor,
     private val config: SWRConfig<KEY, DATA>,
 ) {
-    private val networkMonitor = buildNetworkMonitor()
     val validate = SWRValidate(store, scope, config)
 
     init {

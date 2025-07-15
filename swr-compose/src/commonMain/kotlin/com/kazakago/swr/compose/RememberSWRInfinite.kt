@@ -1,5 +1,6 @@
 package com.kazakago.swr.compose
 
+import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -10,6 +11,8 @@ import com.kazakago.swr.compose.internal.swrInfiniteSaver
 import com.kazakago.swr.compose.internal.toSWRInfiniteState
 import com.kazakago.swr.runtime.SWRConfig
 import com.kazakago.swr.runtime.SWRInfinite
+import com.kazakago.swr.runtime.internal.NetworkMonitor
+import com.kazakago.swr.runtime.internal.buildNetworkMonitor
 import com.kazakago.swr.store.persister.Persister
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.map
@@ -20,6 +23,7 @@ public fun <KEY : Any, DATA> rememberSWRInfinite(
     fetcher: suspend (key: KEY) -> DATA,
     persister: Persister<KEY, DATA>? = null,
     scope: CoroutineScope = rememberCoroutineScope(),
+    @VisibleForTesting networkMonitor: NetworkMonitor = buildNetworkMonitor(),
     config: SWRConfig<KEY, DATA>.() -> Unit = {},
 ): SWRInfiniteState<DATA> {
     return if (!LocalInspectionMode.current) {
@@ -34,6 +38,7 @@ public fun <KEY : Any, DATA> rememberSWRInfinite(
                 scope = scope,
                 persister = persister,
                 cacheOwner = cacheOwner,
+                networkMonitor = networkMonitor,
                 defaultConfig = defaultConfig,
                 config = config,
             )
@@ -45,6 +50,7 @@ public fun <KEY : Any, DATA> rememberSWRInfinite(
                 scope = scope,
                 persister = persister,
                 cacheOwner = cacheOwner,
+                networkMonitor = networkMonitor,
                 defaultConfig = defaultConfig,
                 config = config,
             )

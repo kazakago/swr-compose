@@ -26,7 +26,7 @@ public class SWRPreload<KEY : Any, DATA>(
         null
     }
 
-    public suspend operator fun invoke() {
-        validate?.invoke()
+    public suspend operator fun invoke(): Result<DATA> {
+        return validate?.invoke() ?: Result.failure(IllegalStateException("key is null"))
     }
 }

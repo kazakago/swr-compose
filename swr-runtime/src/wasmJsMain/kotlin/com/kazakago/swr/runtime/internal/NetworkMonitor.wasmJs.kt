@@ -7,9 +7,9 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import org.w3c.dom.events.Event
 
-internal actual fun buildNetworkMonitor(): NetworkMonitor = NetworkMonitorImpl()
+public actual fun buildNetworkMonitor(): NetworkMonitor = NetworkMonitorImpl()
 
-internal class NetworkMonitorImpl : NetworkMonitor {
+private class NetworkMonitorImpl : NetworkMonitor {
 
     override val isOnline: Boolean
         get() = window.navigator.onLine

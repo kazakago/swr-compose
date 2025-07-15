@@ -9,9 +9,9 @@ import kotlinx.coroutines.isActive
 import java.net.NetworkInterface
 import kotlin.time.Duration.Companion.seconds
 
-internal actual fun buildNetworkMonitor(): NetworkMonitor = NetworkMonitorImpl()
+public actual fun buildNetworkMonitor(): NetworkMonitor = NetworkMonitorImpl()
 
-internal class NetworkMonitorImpl : NetworkMonitor {
+private class NetworkMonitorImpl : NetworkMonitor {
 
     companion object {
         private val wifiNetworkInterfaces = listOf("wi-fi", "wireless", "en0", "wlan0", "ap0")
