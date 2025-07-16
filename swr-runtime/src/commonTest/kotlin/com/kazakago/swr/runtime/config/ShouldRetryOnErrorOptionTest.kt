@@ -20,7 +20,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class RevalidateOnMountOptionTest {
+class ShouldRetryOnErrorOptionTest {
 
     @BeforeTest
     fun setUp() {
@@ -33,47 +33,65 @@ class RevalidateOnMountOptionTest {
     }
 
     @Test
-    fun withRevalidateOnMount() = runTest {
-        val swr = SWR(
+    fun withShouldRetryOnError() = runTest {
+        val error = IllegalStateException()
+        val swr = SWR<String, String>(
             key = "key",
             fetcher = {
                 delay(100)
-                "data"
+                throw error
             },
             lifecycleOwner = TestLifecycleOwner(),
             scope = backgroundScope,
             cacheOwner = SWRCacheOwner(),
             networkMonitor = TestNetworkMonitor(),
         ) {
-            revalidateOnMount = true
+            shouldRetryOnError = true
+            onErrorRetry = { _, _, _, revalidate, options ->
+                delay(5000)
+                revalidate(options)
+            }
         }
         swr.stateFlow.test {
             assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
+            advanceTimeBy(101)
+            assertEquals(SWRStoreState.Error(null, error), expectMostRecentItem())
 
-            advanceTimeBy(2500)
-            assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
+            advanceTimeBy(5000)
+            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
+            advanceTimeBy(100)
+            assertEquals(SWRStoreState.Error(null, error), expectMostRecentItem())
         }
     }
 
     @Test
-    fun noRevalidateOnMount() = runTest {
-        val swr = SWR(
+    fun noShouldRetryOnError() = runTest {
+        val error = IllegalStateException()
+        val swr = SWR<String, String>(
             key = "key",
             fetcher = {
                 delay(100)
-                "data"
+                throw error
             },
             lifecycleOwner = TestLifecycleOwner(),
             scope = backgroundScope,
             cacheOwner = SWRCacheOwner(),
             networkMonitor = TestNetworkMonitor(),
         ) {
-            revalidateOnMount = false
+            shouldRetryOnError = false
+            onErrorRetry = { _, _, _, revalidate, options ->
+                delay(5000)
+                revalidate(options)
+            }
         }
         swr.stateFlow.test {
             assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
+            advanceTimeBy(101)
+            assertEquals(SWRStoreState.Error(null, error), expectMostRecentItem())
 
-            advanceTimeBy(2500)
+            advanceTimeBy(5000)
+            expectNoEvents()
+            advanceTimeBy(100)
             expectNoEvents()
         }
     }

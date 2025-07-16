@@ -14,13 +14,14 @@ import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlin.math.exp
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class RevalidateOnMountOptionTest {
+class OnErrorRetryOptionTest {
 
     @BeforeTest
     fun setUp() {
@@ -33,48 +34,63 @@ class RevalidateOnMountOptionTest {
     }
 
     @Test
-    fun withRevalidateOnMount() = runTest {
+    fun defaultOnErrorRetry() = runTest {
+        val error = IllegalStateException()
         val swr = SWR(
             key = "key",
             fetcher = {
                 delay(100)
-                "data"
+                throw error
             },
             lifecycleOwner = TestLifecycleOwner(),
             scope = backgroundScope,
             cacheOwner = SWRCacheOwner(),
             networkMonitor = TestNetworkMonitor(),
-        ) {
-            revalidateOnMount = true
-        }
+        )
         swr.stateFlow.test {
             assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
-
-            advanceTimeBy(2500)
-            assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
+            advanceTimeBy(100)
+            expectNoEvents()
+            advanceTimeBy(15000)
+            assertEquals(SWRStoreState.Error(null, error), expectMostRecentItem())
         }
     }
 
     @Test
-    fun noRevalidateOnMount() = runTest {
+    fun customOnErrorRetry() = runTest {
+        val error = IllegalStateException()
         val swr = SWR(
             key = "key",
             fetcher = {
                 delay(100)
-                "data"
+                throw error
             },
             lifecycleOwner = TestLifecycleOwner(),
             scope = backgroundScope,
             cacheOwner = SWRCacheOwner(),
             networkMonitor = TestNetworkMonitor(),
         ) {
-            revalidateOnMount = false
+            onErrorRetry = { _, _, _, revalidate, options ->
+                delay(100)
+                revalidate(options)
+            }
         }
         swr.stateFlow.test {
             assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
-
-            advanceTimeBy(2500)
-            expectNoEvents()
+            advanceTimeBy(101)
+            assertEquals(SWRStoreState.Error(null, error), expectMostRecentItem())
+            advanceTimeBy(100)
+            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
+            advanceTimeBy(100)
+            assertEquals(SWRStoreState.Error(null, error), expectMostRecentItem())
+            advanceTimeBy(100)
+            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
+            advanceTimeBy(100)
+            assertEquals(SWRStoreState.Error(null, error), expectMostRecentItem())
+            advanceTimeBy(100)
+            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
+            advanceTimeBy(100)
+            assertEquals(SWRStoreState.Error(null, error), expectMostRecentItem())
         }
     }
 }

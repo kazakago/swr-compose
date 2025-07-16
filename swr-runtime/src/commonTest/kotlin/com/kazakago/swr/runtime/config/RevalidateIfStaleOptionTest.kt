@@ -5,6 +5,7 @@ import app.cash.turbine.test
 import com.kazakago.swr.runtime.SWR
 import com.kazakago.swr.runtime.internal.TestNetworkMonitor
 import com.kazakago.swr.store.SWRStoreState
+import com.kazakago.swr.store.cache.SWRCache
 import com.kazakago.swr.store.cache.SWRCacheOwner
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -20,7 +21,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class RevalidateOnMountOptionTest {
+class RevalidateIfStaleOptionTest {
 
     @BeforeTest
     fun setUp() {
@@ -33,22 +34,30 @@ class RevalidateOnMountOptionTest {
     }
 
     @Test
-    fun withRevalidateOnMount() = runTest {
+    fun withRevalidateIfStale() = runTest {
+        val cacheKey = "key"
+        val cacheOwner = SWRCacheOwner().apply {
+            cacheMap[cacheKey] = SWRCache().apply {
+                data = "cache"
+            }
+        }
         val swr = SWR(
-            key = "key",
+            key = cacheKey,
             fetcher = {
                 delay(100)
                 "data"
             },
             lifecycleOwner = TestLifecycleOwner(),
             scope = backgroundScope,
-            cacheOwner = SWRCacheOwner(),
+            cacheOwner = cacheOwner,
             networkMonitor = TestNetworkMonitor(),
         ) {
-            revalidateOnMount = true
+            revalidateIfStale = true
         }
         swr.stateFlow.test {
             assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
+            advanceTimeBy(1)
+            assertEquals(SWRStoreState.Loading("cache"), expectMostRecentItem())
 
             advanceTimeBy(2500)
             assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
@@ -56,22 +65,30 @@ class RevalidateOnMountOptionTest {
     }
 
     @Test
-    fun noRevalidateOnMount() = runTest {
+    fun noRevalidateIfStale() = runTest {
+        val cacheKey = "key"
+        val cacheOwner = SWRCacheOwner().apply {
+            cacheMap[cacheKey] = SWRCache().apply {
+                data = "cache"
+            }
+        }
         val swr = SWR(
-            key = "key",
+            key = cacheKey,
             fetcher = {
                 delay(100)
                 "data"
             },
             lifecycleOwner = TestLifecycleOwner(),
             scope = backgroundScope,
-            cacheOwner = SWRCacheOwner(),
+            cacheOwner = cacheOwner,
             networkMonitor = TestNetworkMonitor(),
         ) {
-            revalidateOnMount = false
+            revalidateIfStale = false
         }
         swr.stateFlow.test {
             assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
+            advanceTimeBy(1)
+            assertEquals(SWRStoreState.Completed("cache"), expectMostRecentItem())
 
             advanceTimeBy(2500)
             expectNoEvents()

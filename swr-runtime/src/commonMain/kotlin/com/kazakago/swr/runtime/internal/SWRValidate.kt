@@ -18,7 +18,7 @@ internal class SWRValidate<KEY : Any, DATA>(
     private var dedupingIntervalJob: Job? = null
 
     suspend operator fun invoke(options: SWRValidateOptions? = null): Result<DATA> {
-        if (dedupingIntervalJob?.isActive == true) {
+        if (dedupingIntervalJob?.isActive == true && options == null) {
             return Result.failure(DedupingIntervalException())
         }
         dedupingIntervalJob = scope.launch {
@@ -26,7 +26,7 @@ internal class SWRValidate<KEY : Any, DATA>(
         }
         val loadingTimeoutJob = scope.launch {
             delay(config.loadingTimeout)
-            config.onLoadingSlow?.invoke()
+            config.onLoadingSlow?.invoke(store.key, config)
         }
         return store.validate()
             .onSuccess { data ->

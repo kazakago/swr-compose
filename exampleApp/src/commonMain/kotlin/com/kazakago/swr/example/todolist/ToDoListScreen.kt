@@ -60,7 +60,7 @@ fun ToDoListScreen(
         key = "/get_todos/$mockServer",
         fetcher = { mockServer.getToDoList() },
     ) {
-        onLoadingSlow = {
+        onLoadingSlow = { _, _ ->
             scope.launch {
                 snackbarHostState.showSnackbar("Loading is slow, Please wait..")
             }

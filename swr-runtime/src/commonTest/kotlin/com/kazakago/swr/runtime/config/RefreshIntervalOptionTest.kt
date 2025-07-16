@@ -18,9 +18,10 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class RevalidateOnMountOptionTest {
+class RefreshIntervalOptionTest {
 
     @BeforeTest
     fun setUp() {
@@ -33,7 +34,7 @@ class RevalidateOnMountOptionTest {
     }
 
     @Test
-    fun withRevalidateOnMount() = runTest {
+    fun noRefreshInterval() = runTest {
         val swr = SWR(
             key = "key",
             fetcher = {
@@ -45,18 +46,21 @@ class RevalidateOnMountOptionTest {
             cacheOwner = SWRCacheOwner(),
             networkMonitor = TestNetworkMonitor(),
         ) {
-            revalidateOnMount = true
+            refreshInterval = 0.seconds
         }
         swr.stateFlow.test {
             assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
-
-            advanceTimeBy(2500)
+            advanceTimeBy(101)
             assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
+            advanceTimeBy(9900)
+            expectNoEvents()
+            advanceTimeBy(101)
+            expectNoEvents()
         }
     }
 
     @Test
-    fun noRevalidateOnMount() = runTest {
+    fun withRefreshInterval() = runTest {
         val swr = SWR(
             key = "key",
             fetcher = {
@@ -68,13 +72,16 @@ class RevalidateOnMountOptionTest {
             cacheOwner = SWRCacheOwner(),
             networkMonitor = TestNetworkMonitor(),
         ) {
-            revalidateOnMount = false
+            refreshInterval = 10.seconds
         }
         swr.stateFlow.test {
             assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
-
-            advanceTimeBy(2500)
-            expectNoEvents()
+            advanceTimeBy(101)
+            assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
+            advanceTimeBy(9900)
+            assertEquals(SWRStoreState.Loading("data"), expectMostRecentItem())
+            advanceTimeBy(101)
+            assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
         }
     }
 }

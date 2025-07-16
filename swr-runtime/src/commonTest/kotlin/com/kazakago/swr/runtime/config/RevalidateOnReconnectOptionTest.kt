@@ -49,8 +49,9 @@ class RevalidateOnReconnectOptionTest {
             revalidateOnReconnect = true
         }
         swr.stateFlow.test {
+            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
             advanceTimeBy(2500)
-            skipItems(2)
+            assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
 
             networkMonitor.onlineStatus.value = false
             advanceTimeBy(1)
@@ -79,8 +80,9 @@ class RevalidateOnReconnectOptionTest {
             revalidateOnReconnect = false
         }
         swr.stateFlow.test {
+            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
             advanceTimeBy(2500)
-            skipItems(2)
+            assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
 
             networkMonitor.onlineStatus.value = false
             advanceTimeBy(1)

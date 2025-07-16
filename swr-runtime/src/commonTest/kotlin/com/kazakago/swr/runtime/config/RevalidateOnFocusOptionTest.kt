@@ -50,8 +50,9 @@ class RevalidateOnFocusOptionTest {
             revalidateOnFocus = true
         }
         swr.stateFlow.test {
+            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
             advanceTimeBy(2500)
-            skipItems(2)
+            assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
 
             lifecycleOwner.setCurrentState(Lifecycle.State.STARTED)
             advanceTimeBy(100)
@@ -81,8 +82,10 @@ class RevalidateOnFocusOptionTest {
             revalidateOnFocus = false
         }
         swr.stateFlow.test {
+            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
             advanceTimeBy(2500)
-            skipItems(2)
+            assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
+
             lifecycleOwner.setCurrentState(Lifecycle.State.STARTED)
             advanceTimeBy(100)
             expectNoEvents()

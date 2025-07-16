@@ -1,5 +1,6 @@
 package com.kazakago.swr.runtime.config
 
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.testing.TestLifecycleOwner
 import app.cash.turbine.test
 import com.kazakago.swr.runtime.SWR
@@ -18,9 +19,10 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class RevalidateOnMountOptionTest {
+class RefreshWhenHiddenOptionTest {
 
     @BeforeTest
     fun setUp() {
@@ -33,48 +35,58 @@ class RevalidateOnMountOptionTest {
     }
 
     @Test
-    fun withRevalidateOnMount() = runTest {
+    fun noRefreshWhenHidden() = runTest {
+        val lifecycleOwner = TestLifecycleOwner(initialState = Lifecycle.State.CREATED)
         val swr = SWR(
             key = "key",
             fetcher = {
                 delay(100)
                 "data"
             },
-            lifecycleOwner = TestLifecycleOwner(),
+            lifecycleOwner = lifecycleOwner,
             scope = backgroundScope,
             cacheOwner = SWRCacheOwner(),
             networkMonitor = TestNetworkMonitor(),
         ) {
-            revalidateOnMount = true
+            refreshInterval = 10.seconds
+            refreshWhenHidden = false
         }
         swr.stateFlow.test {
             assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
-
-            advanceTimeBy(2500)
+            advanceTimeBy(101)
             assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
+            advanceTimeBy(9900)
+            expectNoEvents()
+            advanceTimeBy(101)
+            expectNoEvents()
         }
     }
 
     @Test
-    fun noRevalidateOnMount() = runTest {
+    fun withRefreshWhenHidden() = runTest {
+        val lifecycleOwner = TestLifecycleOwner(initialState = Lifecycle.State.CREATED)
         val swr = SWR(
             key = "key",
             fetcher = {
                 delay(100)
                 "data"
             },
-            lifecycleOwner = TestLifecycleOwner(),
+            lifecycleOwner = lifecycleOwner,
             scope = backgroundScope,
             cacheOwner = SWRCacheOwner(),
             networkMonitor = TestNetworkMonitor(),
         ) {
-            revalidateOnMount = false
+            refreshInterval = 10.seconds
+            refreshWhenHidden = true
         }
         swr.stateFlow.test {
             assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
-
-            advanceTimeBy(2500)
-            expectNoEvents()
+            advanceTimeBy(101)
+            assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
+            advanceTimeBy(9900)
+            assertEquals(SWRStoreState.Loading("data"), expectMostRecentItem())
+            advanceTimeBy(101)
+            assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
         }
     }
 }

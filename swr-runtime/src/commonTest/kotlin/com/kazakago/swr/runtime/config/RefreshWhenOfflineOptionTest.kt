@@ -18,9 +18,10 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class RevalidateOnMountOptionTest {
+class RefreshWhenOfflineOptionTest {
 
     @BeforeTest
     fun setUp() {
@@ -33,7 +34,8 @@ class RevalidateOnMountOptionTest {
     }
 
     @Test
-    fun withRevalidateOnMount() = runTest {
+    fun noRefreshWhenOffline() = runTest {
+        val networkMonitor = TestNetworkMonitor(initialState = false)
         val swr = SWR(
             key = "key",
             fetcher = {
@@ -43,20 +45,25 @@ class RevalidateOnMountOptionTest {
             lifecycleOwner = TestLifecycleOwner(),
             scope = backgroundScope,
             cacheOwner = SWRCacheOwner(),
-            networkMonitor = TestNetworkMonitor(),
+            networkMonitor = networkMonitor,
         ) {
-            revalidateOnMount = true
+            refreshInterval = 10.seconds
+            refreshWhenOffline = false
         }
         swr.stateFlow.test {
             assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
-
-            advanceTimeBy(2500)
+            advanceTimeBy(101)
             assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
+            advanceTimeBy(9900)
+            expectNoEvents()
+            advanceTimeBy(101)
+            expectNoEvents()
         }
     }
 
     @Test
-    fun noRevalidateOnMount() = runTest {
+    fun withRefreshWhenOffline() = runTest {
+        val networkMonitor = TestNetworkMonitor(initialState = false)
         val swr = SWR(
             key = "key",
             fetcher = {
@@ -66,15 +73,19 @@ class RevalidateOnMountOptionTest {
             lifecycleOwner = TestLifecycleOwner(),
             scope = backgroundScope,
             cacheOwner = SWRCacheOwner(),
-            networkMonitor = TestNetworkMonitor(),
+            networkMonitor = networkMonitor,
         ) {
-            revalidateOnMount = false
+            refreshInterval = 10.seconds
+            refreshWhenOffline = true
         }
         swr.stateFlow.test {
             assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
-
-            advanceTimeBy(2500)
-            expectNoEvents()
+            advanceTimeBy(101)
+            assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
+            advanceTimeBy(9900)
+            assertEquals(SWRStoreState.Loading("data"), expectMostRecentItem())
+            advanceTimeBy(101)
+            assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
         }
     }
 }
