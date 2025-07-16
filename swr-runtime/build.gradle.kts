@@ -1,3 +1,4 @@
+import com.android.build.api.dsl.androidLibrary
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -10,11 +11,17 @@ plugins {
 kotlin {
     explicitApi()
 
-    androidTarget {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.fromTarget(libs.versions.jvmToolchain.get()))
+    @Suppress("UnstableApiUsage")
+    androidLibrary {
+        namespace = "com.kazakago.swr.runtime"
+        compileSdk = libs.versions.android.compileSdk.get().toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
+        withHostTestBuilder {}.configure {}
+        compilations.configureEach {
+            compilerOptions.configure {
+                jvmTarget.set(JvmTarget.fromTarget(libs.versions.jvmToolchain.get()))
+            }
         }
-        publishLibraryVariants("release")
     }
     iosX64()
     iosArm64()
@@ -43,18 +50,5 @@ kotlin {
         wasmJsMain.dependencies {
             implementation(libs.kotlinx.browser)
         }
-    }
-}
-
-android {
-    namespace = "com.kazakago.swr.runtime"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
-    defaultConfig {
-        minSdk = libs.versions.android.minSdk.get().toInt()
-        consumerProguardFiles("consumer-rules.pro")
-    }
-    compileOptions {
-        sourceCompatibility(libs.versions.jvmToolchain.get())
-        targetCompatibility(libs.versions.jvmToolchain.get())
     }
 }

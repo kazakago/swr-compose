@@ -46,5 +46,5 @@ compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 android-application = { id = "com.android.application", version.ref = "android-plugin" }
-android-library = { id = "com.android.library", version.ref = "android-plugin" }
+android-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "android-plugin" }
 buildlogic-publish = { id = "buildlogic.publish", version = "unspecified" }
