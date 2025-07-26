@@ -11,10 +11,9 @@ import com.kazakago.swr.store.cache.SWRCacheOwner
 import com.kazakago.swr.store.cache.defaultSWRCacheOwner
 import com.kazakago.swr.store.persister.Persister
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-public class SWRImmutable<KEY : Any, DATA>(
+public fun <KEY : Any, DATA> SWRImmutable(
     key: KEY?,
     fetcher: suspend (key: KEY) -> DATA,
     lifecycleOwner: LifecycleOwner,
@@ -24,37 +23,47 @@ public class SWRImmutable<KEY : Any, DATA>(
     @VisibleForTesting networkMonitor: NetworkMonitor = buildNetworkMonitor(),
     defaultConfig: SWRConfig<Any, Any> = defaultSWRConfig,
     config: SWRConfig<KEY, DATA>.() -> Unit = {},
+): SWRImmutable<KEY, DATA> = SWRImmutable(
+    key = { key },
+    fetcher = fetcher,
+    lifecycleOwner = lifecycleOwner,
+    scope = scope,
+    persister = persister,
+    cacheOwner = cacheOwner,
+    networkMonitor = networkMonitor,
+    defaultConfig = defaultConfig,
+    config = config,
+)
+
+public class SWRImmutable<KEY : Any, DATA>(
+    key: () -> KEY?,
+    fetcher: suspend (key: KEY) -> DATA,
+    lifecycleOwner: LifecycleOwner,
+    scope: CoroutineScope,
+    persister: Persister<KEY, DATA>? = null,
+    cacheOwner: SWRCacheOwner = defaultSWRCacheOwner,
+    @VisibleForTesting networkMonitor: NetworkMonitor = buildNetworkMonitor(),
+    defaultConfig: SWRConfig<Any, Any> = defaultSWRConfig,
+    config: SWRConfig<KEY, DATA>.() -> Unit = {},
 ) {
-    private val swrInternal = if (key != null) {
-        SWRInternal(
-            store = SWRStore(key, fetcher, persister, cacheOwner),
-            lifecycleOwner = lifecycleOwner,
-            scope = scope,
-            networkMonitor = networkMonitor,
-            config = SWRConfig<KEY, DATA>(defaultConfig).apply {
-                config()
-                revalidateIfStale = false
-                revalidateOnFocus = false
-                revalidateOnReconnect = false
-            },
-        )
-    } else {
-        null
-    }
+    private val swrInternal = SWRInternal(
+        store = SWRStore(key, fetcher, persister, cacheOwner),
+        lifecycleOwner = lifecycleOwner,
+        scope = scope,
+        networkMonitor = networkMonitor,
+        config = SWRConfig<KEY, DATA>(defaultConfig).apply {
+            config()
+            revalidateIfStale = false
+            revalidateOnFocus = false
+            revalidateOnReconnect = false
+        },
+    )
 
-    public val stateFlow: StateFlow<SWRStoreState<DATA>> = swrInternal?.stateFlow ?: MutableStateFlow(SWRStoreState.initialize())
+    public val stateFlow: StateFlow<SWRStoreState<DATA>> = swrInternal.stateFlow
 
-    public val mutate: SWRMutate<DATA> = if (swrInternal != null) {
-        SWRMutate(
-            get = swrInternal.store::get,
-            validate = { swrInternal.validate() },
-            update = swrInternal.store::update,
-        )
-    } else {
-        SWRMutate(
-            get = { Result.failure(IllegalStateException("key is null")) },
-            validate = { Result.failure(IllegalStateException("key is null")) },
-            update = {},
-        )
-    }
+    public val mutate: SWRMutate<DATA> = SWRMutate(
+        get = swrInternal.store::get,
+        validate = { swrInternal.validate() },
+        update = swrInternal.store::update,
+    )
 }

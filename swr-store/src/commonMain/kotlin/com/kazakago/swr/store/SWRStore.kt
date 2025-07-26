@@ -3,36 +3,76 @@ package com.kazakago.swr.store
 import com.kazakago.swr.store.cache.SWRCacheOwner
 import com.kazakago.swr.store.cache.defaultSWRCacheOwner
 import com.kazakago.swr.store.internal.DataSelector
+import com.kazakago.swr.store.internal.DataState
 import com.kazakago.swr.store.persister.Persister
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
+
+public fun <KEY : Any, DATA> SWRStore(
+    key: KEY?,
+    fetcher: suspend (key: KEY) -> DATA,
+    persister: Persister<KEY, DATA>? = null,
+    cacheOwner: SWRCacheOwner = defaultSWRCacheOwner,
+): SWRStore<KEY, DATA> = SWRStore(
+    key = { key },
+    fetcher = fetcher,
+    persister = persister,
+    cacheOwner = cacheOwner,
+)
 
 public class SWRStore<KEY : Any, DATA>(
-    public val key: KEY,
+    public val key: () -> KEY?,
     private val fetcher: suspend (key: KEY) -> DATA,
     private val persister: Persister<KEY, DATA>? = null,
     private val cacheOwner: SWRCacheOwner = defaultSWRCacheOwner,
 ) {
     private val dataSelector = DataSelector(
         getDataFromRemote = {
-            fetcher(key)
+            val key = runCatching { key() }.getOrNull()
+            if (key != null) {
+                fetcher(key)
+            } else {
+                throw IllegalStateException("key is null")
+            }
         },
         getDataFromLocal = {
-            cacheOwner.getOrPut(key).syncData {
-                persister?.loadData(key)
+            val key = runCatching { key() }.getOrNull()
+            if (key != null) {
+                cacheOwner.getOrPut(key).syncData {
+                    persister?.loadData(key)
+                }
+            } else {
+                null
             }
         },
         putDataToLocal = { data ->
-            cacheOwner.getOrPut(key).data = data
-            persister?.saveData(key, data)
+            val key = runCatching { key() }.getOrNull()
+            if (key != null) {
+                cacheOwner.getOrPut(key).data = data
+                persister?.saveData(key, data)
+            }
         },
         getStateFlow = {
-            cacheOwner.getOrPut(key).stateMapFlow
+            val key = runCatching { key() }.getOrNull()
+            if (key != null) {
+                cacheOwner.getOrPut(key).stateMapFlow
+            } else {
+                flowOf(DataState.initialize())
+            }
         },
         getState = {
-            cacheOwner.getOrPut(key).stateMapFlow.value
+            val key = runCatching { key() }.getOrNull()
+            if (key != null) {
+                cacheOwner.getOrPut(key).stateMapFlow.value
+            } else {
+                DataState.initialize()
+            }
         },
         putState = { state ->
-            cacheOwner.getOrPut(key).stateMapFlow.value = state
+            val key = runCatching { key() }.getOrNull()
+            if (key != null) {
+                cacheOwner.getOrPut(key).stateMapFlow.value = state
+            }
         },
     )
 

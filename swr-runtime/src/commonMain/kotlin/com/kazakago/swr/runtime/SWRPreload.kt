@@ -7,8 +7,26 @@ import com.kazakago.swr.store.cache.defaultSWRCacheOwner
 import com.kazakago.swr.store.persister.Persister
 import kotlinx.coroutines.CoroutineScope
 
-public class SWRPreload<KEY : Any, DATA>(
+public fun <KEY : Any, DATA> SWRPreload(
     key: KEY?,
+    fetcher: suspend (key: KEY) -> DATA,
+    scope: CoroutineScope,
+    persister: Persister<KEY, DATA>? = null,
+    cacheOwner: SWRCacheOwner = defaultSWRCacheOwner,
+    defaultConfig: SWRConfig<Any, Any> = defaultSWRConfig,
+    config: SWRConfig<KEY, DATA>.() -> Unit = {},
+): SWRPreload<KEY, DATA> = SWRPreload(
+    key = { key },
+    fetcher = fetcher,
+    scope = scope,
+    persister = persister,
+    cacheOwner = cacheOwner,
+    defaultConfig = defaultConfig,
+    config = config,
+)
+
+public class SWRPreload<KEY : Any, DATA>(
+    key: () -> KEY?,
     fetcher: suspend (key: KEY) -> DATA,
     scope: CoroutineScope,
     persister: Persister<KEY, DATA>? = null,

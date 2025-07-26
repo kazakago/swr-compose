@@ -11,10 +11,9 @@ import com.kazakago.swr.store.cache.SWRCacheOwner
 import com.kazakago.swr.store.cache.defaultSWRCacheOwner
 import com.kazakago.swr.store.persister.Persister
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-public class SWR<KEY : Any, DATA>(
+public fun <KEY : Any, DATA> SWR(
     key: KEY?,
     fetcher: suspend (key: KEY) -> DATA,
     lifecycleOwner: LifecycleOwner,
@@ -24,24 +23,42 @@ public class SWR<KEY : Any, DATA>(
     @VisibleForTesting networkMonitor: NetworkMonitor = buildNetworkMonitor(),
     defaultConfig: SWRConfig<Any, Any> = defaultSWRConfig,
     config: SWRConfig<KEY, DATA>.() -> Unit = {},
-) {
-    private val swrInternal = if (key != null) {
-        SWRInternal(
-            store = SWRStore(key, fetcher, persister, cacheOwner),
-            lifecycleOwner = lifecycleOwner,
-            scope = scope,
-            networkMonitor = networkMonitor,
-            config = SWRConfig<KEY, DATA>(defaultConfig).apply(config),
-        )
-    } else {
-        null
-    }
+): SWR<KEY, DATA> = SWR(
+    key = { key },
+    fetcher = fetcher,
+    lifecycleOwner = lifecycleOwner,
+    scope = scope,
+    persister = persister,
+    cacheOwner = cacheOwner,
+    networkMonitor = networkMonitor,
+    defaultConfig = defaultConfig,
+    config = config,
+)
 
-    public val stateFlow: StateFlow<SWRStoreState<DATA>> = swrInternal?.stateFlow ?: MutableStateFlow(SWRStoreState.initialize())
+public class SWR<KEY : Any, DATA>(
+    key: () -> KEY?,
+    fetcher: suspend (key: KEY) -> DATA,
+    lifecycleOwner: LifecycleOwner,
+    scope: CoroutineScope,
+    persister: Persister<KEY, DATA>? = null,
+    cacheOwner: SWRCacheOwner = defaultSWRCacheOwner,
+    @VisibleForTesting networkMonitor: NetworkMonitor = buildNetworkMonitor(),
+    defaultConfig: SWRConfig<Any, Any> = defaultSWRConfig,
+    config: SWRConfig<KEY, DATA>.() -> Unit = {},
+) {
+    private val swrInternal = SWRInternal(
+        store = SWRStore(key, fetcher, persister, cacheOwner),
+        lifecycleOwner = lifecycleOwner,
+        scope = scope,
+        networkMonitor = networkMonitor,
+        config = SWRConfig<KEY, DATA>(defaultConfig).apply(config),
+    )
+
+    public val stateFlow: StateFlow<SWRStoreState<DATA>> = swrInternal.stateFlow
 
     public val mutate: SWRMutate<DATA> = SWRMutate(
-        get = { from -> swrInternal?.store?.get(from) ?: Result.failure(IllegalStateException("key is null")) },
-        validate = { swrInternal?.validate() ?: Result.failure(IllegalStateException("key is null")) },
-        update = { data -> swrInternal?.store?.update(data) },
+        get = { from -> swrInternal.store.get(from) },
+        validate = { swrInternal.validate() },
+        update = { data -> swrInternal.store.update(data) },
     )
 }

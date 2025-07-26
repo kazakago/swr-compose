@@ -24,12 +24,29 @@ public fun <KEY : Any, DATA> rememberSWR(
     scope: CoroutineScope = rememberCoroutineScope(),
     @VisibleForTesting networkMonitor: NetworkMonitor = buildNetworkMonitor(),
     config: SWRConfig<KEY, DATA>.() -> Unit = {},
+): SWRState<DATA> = rememberSWR(
+    key = { key },
+    fetcher = fetcher,
+    persister = persister,
+    scope = scope,
+    networkMonitor = networkMonitor,
+    config = config,
+)
+
+@Composable
+public fun <KEY : Any, DATA> rememberSWR(
+    key: () -> KEY?,
+    fetcher: suspend (key: KEY) -> DATA,
+    persister: Persister<KEY, DATA>? = null,
+    scope: CoroutineScope = rememberCoroutineScope(),
+    @VisibleForTesting networkMonitor: NetworkMonitor = buildNetworkMonitor(),
+    config: SWRConfig<KEY, DATA>.() -> Unit = {},
 ): SWRState<DATA> {
     return if (!LocalInspectionMode.current) {
         val cacheOwner = LocalSWRCacheOwner.current
         val defaultConfig = LocalSWRConfig.current
         val lifecycleOwner = LocalLifecycleOwner.current
-        val swr = remember(key) {
+        val swr = remember {
             SWR(
                 key = key,
                 fetcher = fetcher,

@@ -58,7 +58,7 @@ public class SWRInfinite<KEY : Any, DATA>(
                             }
                         }
                         if (key != null) {
-                            val store = SWRStore(key, fetcher, persister, cacheOwner)
+                            val store = SWRStore({ key }, fetcher, persister, cacheOwner)
                             previousPageData = store.get(from = GettingFrom.LocalOnly).getOrNull()
                             add(SWRInternal(store, lifecycleOwner, scope, networkMonitor, currentConfig))
                         } else {

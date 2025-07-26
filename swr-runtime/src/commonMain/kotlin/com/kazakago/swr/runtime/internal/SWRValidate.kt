@@ -18,6 +18,10 @@ internal class SWRValidate<KEY : Any, DATA>(
     private var dedupingIntervalJob: Job? = null
 
     suspend operator fun invoke(options: SWRValidateOptions? = null): Result<DATA> {
+        val key = runCatching { store.key() }.getOrNull()
+        if (key == null) {
+            return Result.failure(IllegalStateException("key is null"))
+        }
         if (dedupingIntervalJob?.isActive == true && options == null) {
             return Result.failure(DedupingIntervalException())
         }
@@ -26,21 +30,21 @@ internal class SWRValidate<KEY : Any, DATA>(
         }
         val loadingTimeoutJob = scope.launch {
             delay(config.loadingTimeout)
-            config.onLoadingSlow?.invoke(store.key, config)
+            config.onLoadingSlow?.invoke(key, config)
         }
         return store.validate()
             .onSuccess { data ->
                 loadingTimeoutJob.cancel()
                 retryingJobs.clear()
-                config.onSuccess?.invoke(data, store.key, config)
+                config.onSuccess?.invoke(data, key, config)
             }
             .onFailure { error ->
                 loadingTimeoutJob.cancel()
-                config.onError?.invoke(error, store.key, config)
+                config.onError?.invoke(error, key, config)
                 if (config.shouldRetryOnError) {
                     val revalidateOptions = createValidateOptions(options?.retryCount ?: 0)
                     retryingJobs += scope.launch {
-                        config.onErrorRetry(error, store.key, config, ::invoke, revalidateOptions)
+                        config.onErrorRetry(error, key, config, ::invoke, revalidateOptions)
                     }
                 }
             }

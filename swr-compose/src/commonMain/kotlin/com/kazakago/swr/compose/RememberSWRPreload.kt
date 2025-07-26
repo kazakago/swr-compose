@@ -15,10 +15,25 @@ public fun <KEY : Any, DATA> rememberSWRPreload(
     persister: Persister<KEY, DATA>? = null,
     scope: CoroutineScope = rememberCoroutineScope(),
     config: SWRConfig<KEY, DATA>.() -> Unit = {},
+): SWRPreload<KEY, DATA> = rememberSWRPreload(
+    key = { key },
+    fetcher = fetcher,
+    persister = persister,
+    scope = scope,
+    config = config,
+)
+
+@Composable
+public fun <KEY : Any, DATA> rememberSWRPreload(
+    key: () -> KEY?,
+    fetcher: suspend (key: KEY) -> DATA,
+    persister: Persister<KEY, DATA>? = null,
+    scope: CoroutineScope = rememberCoroutineScope(),
+    config: SWRConfig<KEY, DATA>.() -> Unit = {},
 ): SWRPreload<KEY, DATA> {
     val cacheOwner = LocalSWRCacheOwner.current
     val defaultConfig = LocalSWRConfig.current
-    return remember(key) {
+    return remember {
         SWRPreload(
             key = key,
             fetcher = fetcher,
