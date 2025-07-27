@@ -15,7 +15,7 @@ android-plugin = "8.10.0"
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 # Kotlinx DateTime
-kotlinx-datetime = "org.jetbrains.kotlinx:kotlinx-datetime:0.7.1"
+kotlinx-datetime = "org.jetbrains.kotlinx:kotlinx-datetime:0.7.1-0.6.x-compat"
 # AndroidX Compose Icons
 material-icons-core = "org.jetbrains.compose.material:material-icons-core:1.7.3"
 # AndroidX Compose UI Test
