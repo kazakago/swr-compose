@@ -24,7 +24,7 @@ androidx-compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-mani
 # AndroidX Activity Compose
 androidx-activity-compose = "androidx.activity:activity-compose:1.10.1"
 # AndroidX Navigation Compose
-androidx-navigation-compose = "org.jetbrains.androidx.navigation:navigation-compose:2.9.0-beta03"
+androidx-navigation-compose = "org.jetbrains.androidx.navigation:navigation-compose:2.9.0-beta04"
 # AndroidX Lifecycle Runtime Compose
 androidx-lifecycle-runtime-compose = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose:2.9.1"
 # Konnection
