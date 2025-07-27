@@ -34,6 +34,7 @@ kotlin {
         commonMain.dependencies {
             implementation(compose.material3)
             implementation(compose.components.uiToolingPreview)
+            implementation(libs.material.icons.core)
             implementation(libs.kotlinx.datetime)
             implementation(libs.androidx.navigation.compose)
             implementation(projects.swr)
