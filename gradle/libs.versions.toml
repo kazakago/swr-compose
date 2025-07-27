@@ -1,50 +1,50 @@
 [versions]
-version = "0.7.1"
+version = "0.7.2"
 
-compileSdk = "34"
+compileSdk = "36"
 minSdk = "21"
-targetSdk = "34"
+targetSdk = "36"
 
-kotlin = "2.0.20"
-coroutines = "1.9.0"
-compose-ui = "1.7.2"
-android-plugin = "8.6.1"
+kotlin = "2.2.0" # https://kotlinlang.org/docs/multiplatform-compatibility-guide.html#version-compatibility
+coroutines = "1.10.2"
+compose-ui = "1.8.3"
+android-plugin = "8.10.0"
 
 [libraries]
 # Kotlinx Coroutines
 kotlinx-coroutines-swing = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-swing", version.ref = "coroutines" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 # Kotlinx DateTime
-kotlinx-datetime = "org.jetbrains.kotlinx:kotlinx-datetime:0.6.1"
+kotlinx-datetime = "org.jetbrains.kotlinx:kotlinx-datetime:0.7.1"
+# AndroidX Compose Icons
+material-icons-core = "org.jetbrains.compose.material:material-icons-core:1.7.3"
 # AndroidX Compose UI Test
 androidx-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "compose-ui" }
 androidx-compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "compose-ui" }
 # AndroidX Activity Compose
-androidx-activity-compose = "androidx.activity:activity-compose:1.9.2"
+androidx-activity-compose = "androidx.activity:activity-compose:1.10.1"
 # AndroidX Navigation Compose
-androidx-navigation-compose = "org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha10"
-# AndroidX Lifecycle Runtime
-androidx-lifecycle-runtime = "androidx.lifecycle:lifecycle-runtime:2.8.6"
+androidx-navigation-compose = "org.jetbrains.androidx.navigation:navigation-compose:2.9.0-beta04"
+# AndroidX Lifecycle Runtime Compose
+androidx-lifecycle-runtime-compose = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose:2.9.1"
 # Konnection
-konnection = "dev.tmapps:konnection:1.4.2"
+konnection = "dev.tmapps:konnection:1.4.5"
 # MockK
-mockk = "io.mockk:mockk:1.13.12"
+mockk = "io.mockk:mockk:1.14.5"
 # Robolectric
-robolectric = "org.robolectric:robolectric:4.13"
+robolectric = "org.robolectric:robolectric:4.15.1"
 
 [plugins]
 # Kotlin
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" } # https://kotlinlang.org/docs/multiplatform-compatibility-guide.html#version-compatibility
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 # Compose
-compose = { id = "org.jetbrains.compose", version = "1.6.11" }
+compose = { id = "org.jetbrains.compose", version = "1.8.2" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 # Dokka
-dokka = { id = "org.jetbrains.dokka", version = "1.9.20" }
+dokka = { id = "org.jetbrains.dokka", version = "2.0.0" }
 # Android
 android-application = { id = "com.android.application", version.ref = "android-plugin" }
-android-library = { id = "com.android.library", version.ref = "android-plugin" }
-# Nexus Publish
-nexus-publish = { id = "io.github.gradle-nexus.publish-plugin", version = "2.0.0" }
-# Binary Compatibility Validator
-binary-compatibility-validator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version = "0.16.3" }
+android-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "android-plugin" }
+# Maven Publish
+maven-publish = { id = "com.vanniktech.maven.publish", version = "0.34.0" }

@@ -19,12 +19,14 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import com.kazakago.swr.compose.useSWR
 import kotlinx.coroutines.delay
-import kotlinx.datetime.Clock
 import kotlinx.datetime.format
 import kotlinx.datetime.format.DateTimeComponents
 import ui.LoadingContent
+import kotlin.time.Clock
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 private val fetcher: suspend (key: String) -> String = {
     delay(1000)
     Clock.System.now().format(DateTimeComponents.Formats.ISO_DATE_TIME_OFFSET)
