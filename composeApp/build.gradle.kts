@@ -53,26 +53,17 @@ kotlin {
 android {
     namespace = "com.kazakago.swr.compose.example"
     compileSdk = libs.versions.compileSdk.get().toInt()
-
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    sourceSets["main"].res.srcDirs("src/androidMain/res")
-    sourceSets["main"].resources.srcDirs("src/commonMain/resources")
-
     defaultConfig {
-        applicationId = "com.kazakago.swr.compose"
+        applicationId = "com.kazakago.swr.compose.example"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
     }
-    packaging {
-        resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-        }
-    }
     buildTypes {
-        getByName("release") {
+        release {
             isMinifyEnabled = false
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
     compileOptions {
@@ -81,9 +72,6 @@ android {
     }
     buildFeatures {
         compose = true
-    }
-    dependencies {
-        debugImplementation(compose.uiTooling)
     }
 }
 
@@ -97,4 +85,8 @@ compose.desktop {
             packageVersion = "1.0.0"
         }
     }
+}
+
+dependencies {
+    debugImplementation(compose.uiTooling)
 }
