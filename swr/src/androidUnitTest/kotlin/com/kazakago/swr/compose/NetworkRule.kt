@@ -1,7 +1,7 @@
 package com.kazakago.swr.compose
 
-import com.kazakago.swr.compose.internal.GlobalKonnection
-import dev.tmapps.konnection.Konnection
+import com.kazakago.swr.compose.internal.GlobalNetworkMonitor
+import com.kazakago.swr.compose.internal.NetworkMonitor
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.channels.Channel
@@ -12,7 +12,7 @@ import org.junit.runners.model.Statement
 
 class NetworkRule : TestRule {
 
-    private val konnection = mockk<Konnection>()
+    private val networkMonitor = mockk<NetworkMonitor>()
     private val connectionObserver = Channel<Boolean>(Channel.CONFLATED)
 
     override fun apply(base: Statement, description: Description): Statement {
@@ -29,16 +29,16 @@ class NetworkRule : TestRule {
     }
 
     private fun setup() {
-        every { konnection.isConnected() } returns true
-        every { konnection.observeHasConnection() } returns connectionObserver.receiveAsFlow()
-        GlobalKonnection = konnection
+        every { networkMonitor.isOnline() } returns true
+        every { networkMonitor.onlineStatusFlow } returns connectionObserver.receiveAsFlow()
+        GlobalNetworkMonitor = networkMonitor
     }
 
     private fun teardown() {
     }
 
     fun changeNetwork(isConnected: Boolean) {
-        every { konnection.isConnected() } returns isConnected
+        every { networkMonitor.isOnline() } returns isConnected
         connectionObserver.trySend(isConnected)
     }
 }

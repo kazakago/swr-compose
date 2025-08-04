@@ -1,8 +1,10 @@
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -26,12 +28,17 @@ import ui.theme.AppTheme
 
 @Composable
 @Preview
-fun App() {
+fun App(
+    onNavHostReady: suspend (NavController) -> Unit = {},
+) {
     AppTheme {
         val navController = rememberNavController()
         val scope = rememberCoroutineScope()
         val mockServer = remember { mutableStateOf<MockServer>(MockServerSucceed) }
         val isClearCache = remember { mutableStateOf(true) }
+        LaunchedEffect(navController) {
+            onNavHostReady(navController)
+        }
         CompositionLocalProvider(LocalMockServer provides mockServer.value) {
             NavHost(navController = navController, startDestination = "main") {
                 composable("main") { MainScreen(navController, mockServer, isClearCache) }

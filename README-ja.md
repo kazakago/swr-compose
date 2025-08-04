@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/github/license/kazakago/swr-compose.svg)](LICENSE)
 
 [React SWR](https://swr.vercel.app)を[Jetpack Compose](https://developer.android.com/jetpack/compose)と[Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/) 向けに移植したクローンライブラリです。  
-サポートされているプラットフォームはAndroid、そして実験的にDesktop(JVM)、iOSをサポートしています。  
+サポートされているプラットフォームはAndroid、Desktop(JVM)、iOS、Webです。  
 
 オリジナルの`React SWR`のAPI仕様をできる限り踏襲しており、オプションの大部分をサポートしています。  
 

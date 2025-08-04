@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -23,17 +24,21 @@ kotlin {
     iosX64()
     iosArm64()
     iosSimulatorArm64()
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+        browser()
+    }
     sourceSets {
         commonMain.dependencies {
             implementation(compose.ui)
             implementation(libs.androidx.lifecycle.runtime.compose)
-            implementation(libs.konnection)
         }
         jvmMain.dependencies {
             implementation(libs.kotlinx.coroutines.swing)
         }
         androidMain.dependencies {
             implementation(libs.kotlinx.coroutines.android)
+            implementation(libs.androidx.startup)
         }
         androidUnitTest.dependencies {
             implementation(kotlin("test"))
@@ -67,7 +72,7 @@ mavenPublishing {
     signAllPublications()
     coordinates(
         groupId = "com.kazakago.swr.compose",
-        version = libs.versions.version.get(),
+        version = "0.7.2",
     )
     pom {
         name.set("swr-compose")

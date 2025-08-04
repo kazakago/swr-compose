@@ -83,10 +83,8 @@ internal fun <KEY, DATA> RevalidateOnReconnect(
     val revalidateOnReconnect = config.revalidateOnReconnect
     LaunchedEffect(key, lifecycleOwner, revalidateOnReconnect) {
         if (revalidateOnReconnect) {
-            GlobalKonnection.observeHasConnection().collect { hasConnection ->
-                if (hasConnection) {
-                    validate()
-                }
+            GlobalNetworkMonitor.onlineStatusFlow.collect { isOnline ->
+                if (isOnline) validate()
             }
         }
     }
@@ -107,7 +105,7 @@ internal fun <KEY, DATA> RefreshInterval(
             while (true) {
                 delay(refreshInterval)
                 if (refreshWhenHidden || lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
-                    if (refreshWhenOffline || GlobalKonnection.isConnected()) {
+                    if (refreshWhenOffline || GlobalNetworkMonitor.isOnline()) {
                         validate()
                     }
                 }
