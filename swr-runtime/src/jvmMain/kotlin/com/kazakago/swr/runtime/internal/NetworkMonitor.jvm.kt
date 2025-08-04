@@ -18,14 +18,14 @@ private class NetworkMonitorImpl : NetworkMonitor {
         private val ethernetNetworkInterfaces = listOf("ethernet", "lan", "en1", "eth0", "eth1")
     }
 
-    override val isOnline: Boolean
-        get() = isConnected()
     override val onlineStatusFlow: Flow<Boolean> = callbackFlow {
         while (isActive) {
             delay(1.seconds)
             trySend(isConnected())
         }
     }.distinctUntilChanged().drop(1)
+
+    override fun isOnline(): Boolean = isConnected()
 
     private fun isConnected(): Boolean = try {
         NetworkInterface.getNetworkInterfaces().toList()

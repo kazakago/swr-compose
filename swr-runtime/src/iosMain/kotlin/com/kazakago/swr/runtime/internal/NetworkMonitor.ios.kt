@@ -23,7 +23,6 @@ public actual fun buildNetworkMonitor(): NetworkMonitor = NetworkMonitorImpl()
 private class NetworkMonitorImpl : NetworkMonitor {
 
     private var path: nw_path_t? = null
-    override val isOnline: Boolean = isConnected(path)
     override val onlineStatusFlow: Flow<Boolean> = callbackFlow {
         @OptIn(ExperimentalForeignApi::class)
         val queue = dispatch_get_global_queue(QOS_CLASS_BACKGROUND.convert(), 0.convert())
@@ -38,6 +37,8 @@ private class NetworkMonitorImpl : NetworkMonitor {
             nw_path_monitor_cancel(monitor)
         }
     }.distinctUntilChanged().drop(1)
+
+    override fun isOnline(): Boolean = isConnected(path)
 
     private fun isConnected(path: nw_path_t): Boolean {
         return nw_path_get_status(path) == nw_path_status_satisfied

@@ -65,7 +65,7 @@ internal class SWRInternal<KEY : Any, DATA>(
                 val validateInterval = suspend {
                     while (isActive) {
                         delay(config.refreshInterval)
-                        if (networkMonitor.isOnline || config.refreshWhenOffline) {
+                        if (networkMonitor.isOnline() || config.refreshWhenOffline) {
                             validate()
                         }
                     }

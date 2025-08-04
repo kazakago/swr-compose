@@ -18,12 +18,7 @@ public actual fun buildNetworkMonitor(): NetworkMonitor = NetworkMonitorImpl(app
 private class NetworkMonitorImpl(context: Context) : NetworkMonitor {
 
     private val connectivityManager = context.getSystemService(ConnectivityManager::class.java)
-    override val isOnline: Boolean
-        get() {
-            val network = connectivityManager.activeNetwork
-            val capabilities = connectivityManager.getNetworkCapabilities(network)
-            return isConnected(capabilities)
-        }
+
     override val onlineStatusFlow: Flow<Boolean> = callbackFlow {
         val request = NetworkRequest.Builder()
             .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
@@ -47,6 +42,12 @@ private class NetworkMonitorImpl(context: Context) : NetworkMonitor {
             connectivityManager.unregisterNetworkCallback(networkCallback)
         }
     }.distinctUntilChanged()
+
+    override fun isOnline(): Boolean {
+        val network = connectivityManager.activeNetwork
+        val capabilities = connectivityManager.getNetworkCapabilities(network)
+        return isConnected(capabilities)
+    }
 
     private fun isConnected(capabilities: NetworkCapabilities?): Boolean {
         capabilities ?: return false

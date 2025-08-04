@@ -11,8 +11,6 @@ public actual fun buildNetworkMonitor(): NetworkMonitor = NetworkMonitorImpl()
 
 private class NetworkMonitorImpl : NetworkMonitor {
 
-    override val isOnline: Boolean
-        get() = window.navigator.onLine
     override val onlineStatusFlow: Flow<Boolean> = callbackFlow {
         val onlineEvent: ((Event) -> Unit) = { trySend(true) }
         val offlineEvent: ((Event) -> Unit) = { trySend(false) }
@@ -23,4 +21,6 @@ private class NetworkMonitorImpl : NetworkMonitor {
             window.removeEventListener("offline", offlineEvent)
         }
     }.distinctUntilChanged()
+
+    override fun isOnline(): Boolean = window.navigator.onLine
 }
