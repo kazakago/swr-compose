@@ -22,13 +22,14 @@ public fun <KEY : Any, DATA> rememberSWRImmutable(
     fetcher: suspend (key: KEY) -> DATA,
     persister: Persister<KEY, DATA>? = null,
     scope: CoroutineScope = rememberCoroutineScope(),
-    @VisibleForTesting networkMonitor: NetworkMonitor = buildNetworkMonitor(),
+    @VisibleForTesting networkMonitor: NetworkMonitor? = null,
     config: SWRConfig<KEY, DATA>.() -> Unit = {},
 ): SWRState<DATA> {
     return if (!LocalInspectionMode.current) {
         val cacheOwner = LocalSWRCacheOwner.current
         val defaultConfig = LocalSWRConfig.current
         val lifecycleOwner = LocalLifecycleOwner.current
+        val networkMonitor = networkMonitor ?: buildNetworkMonitor()
         val swr = remember(key) {
             SWRImmutable(
                 key = key,
