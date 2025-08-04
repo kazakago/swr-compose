@@ -1,4 +1,4 @@
-import com.android.build.api.dsl.androidLibrary
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -12,17 +12,12 @@ plugins {
 
 kotlin {
     explicitApi()
-    @Suppress("UnstableApiUsage")
-    androidLibrary {
-        namespace = "com.kazakago.swr.compose"
-        compileSdk = libs.versions.compileSdk.get().toInt()
-        minSdk = libs.versions.minSdk.get().toInt()
-        withHostTestBuilder {}.configure {}
-        compilations.configureEach {
-            compilerOptions.configure {
-                jvmTarget.set(JvmTarget.JVM_1_8)
-            }
+    androidTarget {
+        @OptIn(ExperimentalKotlinGradlePluginApi::class)
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_1_8)
         }
+        publishLibraryVariants("release")
     }
     jvm()
     iosX64()
@@ -46,6 +41,23 @@ kotlin {
             implementation(libs.androidx.compose.ui.test.manifest)
             implementation(libs.robolectric)
             implementation(libs.mockk)
+        }
+    }
+}
+
+android {
+    namespace = "com.kazakago.swr.compose"
+    compileSdk = libs.versions.compileSdk.get().toInt()
+    defaultConfig {
+        minSdk = libs.versions.minSdk.get().toInt()
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
         }
     }
 }

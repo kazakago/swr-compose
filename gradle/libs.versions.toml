@@ -45,6 +45,6 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 dokka = { id = "org.jetbrains.dokka", version = "2.0.0" }
 # Android
 android-application = { id = "com.android.application", version.ref = "android-plugin" }
-android-library = { id = "com.android.kotlin.multiplatform.library", version.ref = "android-plugin" }
+android-library = { id = "com.android.library", version.ref = "android-plugin" }
 # Maven Publish
 maven-publish = { id = "com.vanniktech.maven.publish", version = "0.34.0" }
