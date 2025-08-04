@@ -4,7 +4,7 @@ import androidx.compose.runtime.Immutable
 import com.kazakago.swr.runtime.SWRInfiniteMutate
 
 @Immutable
-public sealed interface SWRInfiniteState<DATA> {
+public sealed class SWRInfiniteState<DATA> {
 
     public companion object {
         public fun <DATA> initialize(): SWRInfiniteState<DATA> = Loading(
@@ -20,12 +20,12 @@ public sealed interface SWRInfiniteState<DATA> {
         )
     }
 
-    public val data: List<DATA?>?
-    public val error: Throwable?
-    public val isLoading: Boolean
-    public val mutate: SWRInfiniteMutate<DATA>
-    public val size: Int
-    public val setSize: (size: Int) -> Unit
+    public abstract val data: List<DATA?>?
+    public abstract val error: Throwable?
+    public abstract val isLoading: Boolean
+    public abstract val mutate: SWRInfiniteMutate<DATA>
+    public abstract val size: Int
+    public abstract val setSize: (size: Int) -> Unit
 
     public operator fun component1(): List<DATA?>? = data
     public operator fun component2(): Throwable? = error
@@ -34,12 +34,39 @@ public sealed interface SWRInfiniteState<DATA> {
     public operator fun component5(): Int = size
     public operator fun component6(): ((size: Int) -> Unit) = setSize
 
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+
+        other as SWRInfiniteState<*>
+
+        if (data != other.data) return false
+        if (error != other.error) return false
+        if (isLoading != other.isLoading) return false
+        if (mutate != other.mutate) return false
+        if (size != other.size) return false
+        if (setSize != other.setSize) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = this::class.hashCode()
+        result = 31 * result + (data?.hashCode() ?: 0)
+        result = 31 * result + (error?.hashCode() ?: 0)
+        result = 31 * result + isLoading.hashCode()
+        result = 31 * result + mutate.hashCode()
+        result = 31 * result + size
+        result = 31 * result + setSize.hashCode()
+        return result
+    }
+
     public class Loading<DATA>(
         override val data: List<DATA?>?,
         override val mutate: SWRInfiniteMutate<DATA>,
         override val size: Int,
         override val setSize: (Int) -> Unit,
-    ) : SWRInfiniteState<DATA> {
+    ) : SWRInfiniteState<DATA>() {
         override val error: Throwable? = null
         override val isLoading: Boolean = true
     }
@@ -49,7 +76,7 @@ public sealed interface SWRInfiniteState<DATA> {
         override val mutate: SWRInfiniteMutate<DATA>,
         override val size: Int,
         override val setSize: (Int) -> Unit,
-    ) : SWRInfiniteState<DATA> {
+    ) : SWRInfiniteState<DATA>() {
         override val error: Throwable? = null
         override val isLoading: Boolean = false
     }
@@ -60,7 +87,7 @@ public sealed interface SWRInfiniteState<DATA> {
         override val mutate: SWRInfiniteMutate<DATA>,
         override val size: Int,
         override val setSize: (Int) -> Unit,
-    ) : SWRInfiniteState<DATA> {
+    ) : SWRInfiniteState<DATA>() {
         override val isLoading: Boolean = false
     }
 }

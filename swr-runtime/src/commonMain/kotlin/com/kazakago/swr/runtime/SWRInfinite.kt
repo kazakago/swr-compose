@@ -13,11 +13,9 @@ import com.kazakago.swr.store.cache.defaultSWRCacheOwner
 import com.kazakago.swr.store.persister.Persister
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 public class SWRInfinite<KEY : Any, DATA>(
@@ -66,37 +64,35 @@ public class SWRInfinite<KEY : Any, DATA>(
                         }
                     }
                 }
-                stateFlow = combine(
-                    flows = swrList.map { it?.stateFlow ?: MutableStateFlow(SWRStoreState.initialize()) },
-                    transform = { it },
-                )
-                    .map { stateList ->
-                        val data = stateList.map { it.data }
-                        val error = stateList.firstNotNullOfOrNull { it.error }
-                        val isLoading = stateList.any { it.isLoading }
-                        if (error != null) {
-                            SWRStoreState.Error(data, error)
-                        } else if (isLoading) {
-                            if (stateList.any { it.data != null }) {
-                                SWRStoreState.Loading(data)
+                launch {
+                    combine(
+                        flows = swrList.map { it?.stateFlow ?: MutableStateFlow(SWRStoreState.initialize()) },
+                        transform = { stateList ->
+                            val data = stateList.map { it.data }
+                            val error = stateList.firstNotNullOfOrNull { it.error }
+                            val isLoading = stateList.any { it.isLoading }
+                            if (error != null) {
+                                SWRStoreState.Error(data, error)
+                            } else if (isLoading) {
+                                if (stateList.any { it.data != null }) {
+                                    SWRStoreState.Loading(data)
+                                } else {
+                                    SWRStoreState.Loading(null)
+                                }
                             } else {
-                                SWRStoreState.Loading(null)
+                                SWRStoreState.Completed(data)
                             }
-                        } else {
-                            SWRStoreState.Completed(data)
-                        }
+                        },
+                    ).collect {
+                        _stateFlow.value = it
                     }
-                    .stateIn(
-                        scope = scope,
-                        started = SharingStarted.Lazily,
-                        initialValue = SWRStoreState.initialize(),
-                    )
+                }
             }
         }
     }
 
-    public var stateFlow: StateFlow<SWRStoreState<List<DATA?>>> = MutableStateFlow(SWRStoreState.initialize())
-        private set
+    private val _stateFlow: MutableStateFlow<SWRStoreState<List<DATA?>>> = MutableStateFlow(SWRStoreState.initialize())
+    public val stateFlow: StateFlow<SWRStoreState<List<DATA?>>> = _stateFlow.asStateFlow()
 
     public val mutate: SWRInfiniteMutate<DATA> = SWRInfiniteMutate(
         getSize = { pageSize.value },
