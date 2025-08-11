@@ -17,6 +17,13 @@ According to `React SWR`, "SWR" refers to
 
 > The name “SWR” is derived from stale-while-revalidate, a HTTP cache invalidation strategy popularized by [HTTP RFC 5861](https://www.rfc-editor.org/rfc/rfc5861). SWR is a strategy to first return the data from cache (stale), then send the fetch request (revalidate), and finally come with the up-to-date data.
 
+## Requirement
+
+- Android
+    - Android 6.0 (API level 23) or later
+- iOS/Desktop/Web
+    - https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-compatibility-and-versioning.html#supported-platforms
+
 ## Install
 
 Add the following gradle dependency exchanging `*.*.*` for the latest release. [![Maven Central](https://img.shields.io/maven-central/v/com.kazakago.swr/swr-compose.svg)](https://central.sonatype.com/namespace/com.kazakago.swr)
