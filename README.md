@@ -58,6 +58,8 @@ fun Profile() {
 
 ## Example
 
+Live demo of Kotlin/Wasm is [**here**](https://kazakago.github.io/swr-compose/).
+
 Refer to the [**example module**](exampleApp) for details. This module works as an Compose Multiplatform app.
 
 ## Supported Features
