@@ -19,6 +19,7 @@ import com.kazakago.swr.compose.rememberSWR
 import com.kazakago.swr.example.ui.ErrorContent
 import com.kazakago.swr.example.ui.LoadingContent
 import kotlinx.coroutines.delay
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
@@ -27,6 +28,7 @@ private val fetcher: suspend (key: String) -> String = {
     "Hello world!"
 }
 
+@SerialName("data_fetching")
 @Serializable
 data object DataFetchingRoute
 

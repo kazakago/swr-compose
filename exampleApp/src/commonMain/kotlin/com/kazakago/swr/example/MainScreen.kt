@@ -32,9 +32,11 @@ import com.kazakago.swr.example.todolist.server.MockServerLoadingSlow
 import com.kazakago.swr.example.todolist.server.MockServerMutationFailed
 import com.kazakago.swr.example.todolist.server.MockServerRandomFailed
 import com.kazakago.swr.example.todolist.server.MockServerSucceed
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
+@SerialName("main")
 @Serializable
 data object MainRoute
 

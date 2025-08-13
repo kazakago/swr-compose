@@ -24,6 +24,7 @@ import com.kazakago.swr.compose.rememberSWR
 import com.kazakago.swr.example.ui.LoadingContent
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 private val fetcher: suspend (key: String) -> String = {
@@ -31,6 +32,7 @@ private val fetcher: suspend (key: String) -> String = {
     "Hello world!"
 }
 
+@SerialName("global_configuration")
 @Serializable
 data object GlobalConfigurationRoute
 

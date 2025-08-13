@@ -38,9 +38,11 @@ import com.kazakago.swr.example.todolist.server.LocalMockServer
 import com.kazakago.swr.example.ui.ErrorContent
 import com.kazakago.swr.example.ui.LoadingContent
 import kotlinx.coroutines.launch
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.ui.tooling.preview.Preview
 
+@SerialName("todo_list")
 @Serializable
 data object ToDoListRoute
 

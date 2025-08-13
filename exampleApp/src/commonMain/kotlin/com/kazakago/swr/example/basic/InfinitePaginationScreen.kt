@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import com.kazakago.swr.compose.rememberSWRInfinite
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.time.Duration.Companion.seconds
@@ -42,6 +43,7 @@ private val getKey: (pageIndex: Int, previousPageData: List<String>?) -> String?
     else "/infinite_paginationKey/$pageIndex"
 }
 
+@SerialName("infinite_pagination")
 @Serializable
 data object InfinitePaginationRoute
 

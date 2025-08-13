@@ -22,6 +22,7 @@ import com.kazakago.swr.example.ui.LoadingContent
 import kotlinx.coroutines.delay
 import kotlinx.datetime.format
 import kotlinx.datetime.format.DateTimeComponents
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.time.Clock
@@ -34,6 +35,7 @@ private val fetcher: suspend (key: String) -> String = {
     Clock.System.now().format(DateTimeComponents.Formats.ISO_DATE_TIME_OFFSET)
 }
 
+@SerialName("auto_revalidation")
 @Serializable
 data object AutoRevalidationRoute
 

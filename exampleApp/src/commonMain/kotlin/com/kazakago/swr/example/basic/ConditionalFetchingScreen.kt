@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import com.kazakago.swr.compose.rememberSWR
 import com.kazakago.swr.example.ui.LoadingContent
 import kotlinx.coroutines.delay
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.time.Duration.Companion.seconds
@@ -35,6 +36,7 @@ private val projectsFetcher: suspend (key: String) -> List<String> = {
     listOf("Project1", "Project2", "Project3")
 }
 
+@SerialName("conditional_fetching")
 @Serializable
 data object ConditionalFetchingRoute
 

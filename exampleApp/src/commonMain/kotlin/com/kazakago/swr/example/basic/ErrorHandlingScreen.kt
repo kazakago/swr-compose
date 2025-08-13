@@ -23,6 +23,7 @@ import com.kazakago.swr.example.ui.ErrorContent
 import com.kazakago.swr.example.ui.LoadingContent
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.time.Duration.Companion.seconds
 
@@ -31,6 +32,7 @@ private val fetcher: suspend (key: String) -> String = {
     throw NullPointerException()
 }
 
+@SerialName("error_handling")
 @Serializable
 data object ErrorHandlingRoute
 

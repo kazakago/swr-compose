@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.kazakago.swr.compose.rememberSWR
 import kotlinx.coroutines.delay
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.ui.tooling.preview.Preview
 import kotlin.time.Duration.Companion.seconds
@@ -35,6 +36,7 @@ private val fetcher: suspend (key: String) -> List<String> = { key ->
     List(10) { "$key - $it" }
 }
 
+@SerialName("pagination")
 @Serializable
 data object PaginationRoute
 

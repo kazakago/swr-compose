@@ -26,6 +26,7 @@ import com.kazakago.swr.example.ui.LoadingContent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 private val fetcher: suspend (key: String) -> String = {
@@ -33,6 +34,7 @@ private val fetcher: suspend (key: String) -> String = {
     "Hello world!"
 }
 
+@SerialName("prefetching")
 @Serializable
 data object PrefetchingRoute
 
@@ -74,6 +76,7 @@ fun PrefetchingScreen(
     }
 }
 
+@SerialName("prefetching_next")
 @Serializable
 data object PrefetchingNextRoute
 
