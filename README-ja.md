@@ -50,7 +50,7 @@ fun Profile() {
 
 ## 例
 
-Kotlin/Wasmによるライブデモは[こちら](https://kazakago.github.io/swr-compose/).
+Kotlin/Wasmによるライブデモは[**こちら**](https://kazakago.github.io/swr-compose/).
 
 詳細な実装例は[**exampleモジュール**](composeApp)を参照して下さい。Compose Multiplatformアプリとして実行できます。
 
