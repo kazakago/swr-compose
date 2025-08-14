@@ -4,10 +4,10 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
-    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.kotlin)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.compose)
-    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlin.compose.compiler)
+    alias(libs.plugins.jetbrains.compose)
     alias(libs.plugins.android.application)
 }
 
@@ -62,7 +62,7 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.kotlinx.datetime)
             implementation(libs.kotlinx.serialization.core)
-            implementation(libs.material.icons.core)
+            implementation(libs.androidx.material.icons)
             implementation(libs.androidx.navigation.compose)
         }
         androidMain.dependencies {
