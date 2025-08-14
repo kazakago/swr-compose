@@ -1,4 +1,3 @@
-import com.android.build.api.dsl.androidLibrary
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
@@ -13,11 +12,11 @@ plugins {
 kotlin {
     explicitApi()
 
-    @Suppress("UnstableApiUsage")
     androidLibrary {
         namespace = "com.kazakago.swr.compose"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
+        @Suppress("UnstableApiUsage")
         withHostTestBuilder {}.configure {}
         compilations.configureEach {
             compilerOptions.configure {

@@ -4,9 +4,10 @@ kotlinx-coroutines = "1.10.2"
 kotlinx-serialization = "1.9.0"
 kotlinx-browser = "0.3"
 kotlinx-datetime = "0.7.1"
-jetbrains-compose = "1.8.2"
+jetbrains-compose = "1.9.0-beta01" # https://www.jetbrains.com/help/kotlin-multiplatform-dev/whats-new-compose-190.html
+jetbrains-material3 = "1.9.0-alpha04"
 jetbrains-material-icons = "1.7.3"
-jetbrains-navigation = "2.9.0-beta03"
+jetbrains-navigation = "2.9.0-beta04"
 jetbrains-lifecycle = "2.9.1"
 androidx-lifecycle = "2.9.2"
 androidx-startup = "1.2.0"
@@ -30,6 +31,7 @@ kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 kotlinx-browser = { module = "org.jetbrains.kotlinx:kotlinx-browser", version.ref = "kotlinx-browser" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 dokka-plugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
+androidx-material3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "jetbrains-material3" }
 androidx-material-icons = { module = "org.jetbrains.compose.material:material-icons-core", version.ref = "jetbrains-material-icons" }
 androidx-navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "jetbrains-navigation" }
 androidx-lifecycle-runtime = { module = "org.jetbrains.androidx.lifecycle:lifecycle-runtime", version.ref = "jetbrains-lifecycle" }
