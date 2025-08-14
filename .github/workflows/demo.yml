@@ -1,0 +1,24 @@
+name: Demo
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  pages: write
+  id-token: write
+
+jobs:
+  demo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - run: ./gradlew exampleApp:wasmJsBrowserDistribution
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: exampleApp/build/dist/wasmJs/productionExecutable
+
+      - uses: actions/deploy-pages@v4
