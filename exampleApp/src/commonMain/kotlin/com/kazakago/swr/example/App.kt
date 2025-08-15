@@ -6,8 +6,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.MaterialExpressiveTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -46,11 +45,10 @@ import com.kazakago.swr.example.todolist.server.LocalMockServer
 import com.kazakago.swr.example.todolist.server.MockServer
 import com.kazakago.swr.example.todolist.server.MockServerSucceed
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun App(
     onNavHostReady: suspend (NavController) -> Unit = {},
-) = MaterialExpressiveTheme {
+) = MaterialTheme {
     val navController = rememberNavController()
     val scope = rememberCoroutineScope()
     val mockServer = remember { mutableStateOf<MockServer>(MockServerSucceed) }
