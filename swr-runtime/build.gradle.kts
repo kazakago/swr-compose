@@ -46,6 +46,9 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.androidx.startup)
         }
+        jvmMain.dependencies {
+            implementation(libs.kotlinx.coroutines.swing)
+        }
         wasmJsMain.dependencies {
             implementation(libs.kotlinx.browser)
         }
