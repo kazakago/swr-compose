@@ -17,7 +17,7 @@ jobs:
 
       - run: ./gradlew composeApp:wasmJsBrowserDistribution
 
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v4
         with:
           path: composeApp/build/dist/wasmJs/productionExecutable
 
