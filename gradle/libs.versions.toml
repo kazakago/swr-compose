@@ -2,7 +2,7 @@
 kotlin = "2.2.0" # https://kotlinlang.org/docs/multiplatform-compatibility-guide.html#version-compatibility
 coroutines = "1.10.2"
 compose-ui = "1.8.3"
-android-plugin = "8.10.0"
+android-plugin = "8.13.0"
 compileSdk = "36"
 minSdk = "23"
 targetSdk = "36"
