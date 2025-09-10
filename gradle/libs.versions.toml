@@ -14,7 +14,7 @@ kotlinx-datetime = "org.jetbrains.kotlinx:kotlinx-datetime:0.7.1"
 material-icons-core = "org.jetbrains.compose.material:material-icons-core:1.7.3"
 androidx-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "compose-ui" }
 androidx-compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "compose-ui" }
-androidx-activity-compose = "androidx.activity:activity-compose:1.10.1"
+androidx-activity-compose = "androidx.activity:activity-compose:1.11.0"
 androidx-navigation-compose = "org.jetbrains.androidx.navigation:navigation-compose:2.9.0-beta03"
 androidx-lifecycle-runtime-compose = "org.jetbrains.androidx.lifecycle:lifecycle-runtime-compose:2.9.2"
 androidx-startup = "androidx.startup:startup-runtime:1.2.0"
