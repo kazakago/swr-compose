@@ -16,7 +16,6 @@ kotlin {
         namespace = "com.kazakago.swr.compose"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
-        @Suppress("UnstableApiUsage")
         withHostTestBuilder {}.configure {}
         compilations.configureEach {
             compilerOptions.configure {
