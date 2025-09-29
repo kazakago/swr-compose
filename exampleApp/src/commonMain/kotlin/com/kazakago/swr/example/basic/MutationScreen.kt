@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -25,6 +23,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.jetbrains.compose.resources.painterResource
+import swr.exampleapp.generated.resources.Res
+import swr.exampleapp.generated.resources.arrow_back_24dp
 
 private val fetcher: suspend (key: String) -> String = {
     delay(1000)
@@ -53,7 +54,7 @@ fun MutationScreen(
                 title = { Text("Mutation") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                        Icon(painterResource(Res.drawable.arrow_back_24dp), contentDescription = null)
                     }
                 },
             )

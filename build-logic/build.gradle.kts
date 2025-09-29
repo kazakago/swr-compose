@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    implementation(libs.kotlin.plugin)
-    implementation(libs.dokka.plugin)
-    implementation(libs.maven.publish.plugin)
+    implementation(libs.kotlinPlugin)
+    implementation(libs.dokkaPlugin)
+    implementation(libs.mavenPublishPlugin)
 }

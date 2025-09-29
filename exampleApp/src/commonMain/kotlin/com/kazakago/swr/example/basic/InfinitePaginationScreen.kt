@@ -8,9 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -30,7 +27,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import swr.exampleapp.generated.resources.Res
+import swr.exampleapp.generated.resources.arrow_back_24dp
+import swr.exampleapp.generated.resources.refresh_24dp
 import kotlin.time.Duration.Companion.seconds
 
 private val fetcher: suspend (key: String) -> List<String> = { key ->
@@ -65,12 +66,12 @@ fun InfinitePaginationScreen(
                 title = { Text("Infinite Pagination") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                        Icon(painterResource(Res.drawable.arrow_back_24dp), contentDescription = null)
                     }
                 },
                 actions = {
                     IconButton(onClick = { scope.launch { mutate() } }) {
-                        Icon(Icons.Default.Refresh, contentDescription = null)
+                        Icon(painterResource(Res.drawable.refresh_24dp), contentDescription = null)
                     }
                 }
             )

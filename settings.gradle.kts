@@ -28,6 +28,10 @@ dependencyResolutionManagement {
     }
 }
 
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}
+
 include(":exampleApp")
 include(":swr-store")
 include(":swr-runtime")

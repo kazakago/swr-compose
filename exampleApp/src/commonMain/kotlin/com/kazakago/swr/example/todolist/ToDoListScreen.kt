@@ -10,10 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -40,7 +36,12 @@ import com.kazakago.swr.example.ui.LoadingContent
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import swr.exampleapp.generated.resources.Res
+import swr.exampleapp.generated.resources.add_24dp
+import swr.exampleapp.generated.resources.arrow_back_24dp
+import swr.exampleapp.generated.resources.refresh_24dp
 
 @SerialName("todo_list")
 @Serializable
@@ -74,19 +75,19 @@ fun ToDoListScreen(
                 title = { Text(text = "ToDo List") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                        Icon(painterResource(Res.drawable.arrow_back_24dp), contentDescription = null)
                     }
                 },
                 actions = {
                     IconButton(onClick = { scope.launch { mutate() } }) {
-                        Icon(Icons.Default.Refresh, contentDescription = null)
+                        Icon(painterResource(Res.drawable.refresh_24dp), contentDescription = null)
                     }
                 }
             )
         },
         floatingActionButton = {
             FloatingActionButton(onClick = { openToDoCreationDialog.value = true }) {
-                Icon(Icons.Default.Add, contentDescription = null)
+                Icon(painterResource(Res.drawable.add_24dp), contentDescription = null)
             }
         },
         snackbarHost = {

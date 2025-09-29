@@ -2,33 +2,37 @@ import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    alias(libs.plugins.kotlin)
-    alias(libs.plugins.kotlin.compose.compiler)
-    alias(libs.plugins.jetbrains.compose)
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.buildlogic.publish)
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.androidLibrary)
+    alias(libs.plugins.buildLogicPublish)
 }
 
 kotlin {
     explicitApi()
 
-    androidLibrary {
+    android {
         namespace = "com.kazakago.swr.compose"
-        compileSdk = libs.versions.android.compileSdk.get().toInt()
-        minSdk = libs.versions.android.minSdk.get().toInt()
-        withHostTestBuilder {}.configure {}
-        compilations.configureEach {
-            compilerOptions.configure {
-                jvmTarget.set(JvmTarget.fromTarget(libs.versions.jvmToolchain.get()))
-            }
+        compileSdk = libs.versions.androidCompileSdk.get().toInt()
+        minSdk = libs.versions.androidMinSdk.get().toInt()
+        withHostTest {}
+        compilerOptions {
+            jvmTarget.set(JvmTarget.fromTarget(libs.versions.jvmToolchain.get()))
         }
     }
+
     iosX64()
     iosArm64()
     iosSimulatorArm64()
+
     jvm()
+
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
+        browser()
+    }
+    js {
         browser()
     }
 
@@ -36,12 +40,12 @@ kotlin {
         commonMain.dependencies {
             api(projects.swrRuntime)
             implementation(compose.ui)
-            implementation(libs.kotlinx.coroutines.core)
-            implementation(libs.androidx.lifecycle.runtime.compose)
+            implementation(libs.kotlinxCoroutinesCore)
+            implementation(libs.androidxLifecycleRuntimeCompose)
         }
         commonTest.dependencies {
-            implementation(libs.kotlin.test)
-            implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.kotlinTest)
+            implementation(libs.kotlinxCoroutinesTest)
         }
     }
 }

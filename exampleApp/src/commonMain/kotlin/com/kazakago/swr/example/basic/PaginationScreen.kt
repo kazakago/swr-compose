@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -28,7 +26,10 @@ import com.kazakago.swr.compose.rememberSWR
 import kotlinx.coroutines.delay
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.ui.tooling.preview.Preview
+import swr.exampleapp.generated.resources.Res
+import swr.exampleapp.generated.resources.arrow_back_24dp
 import kotlin.time.Duration.Companion.seconds
 
 private val fetcher: suspend (key: String) -> List<String> = { key ->
@@ -52,7 +53,7 @@ fun PaginationScreen(
                 title = { Text("Pagination") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null)
+                        Icon(painterResource(Res.drawable.arrow_back_24dp), contentDescription = null)
                     }
                 },
             )

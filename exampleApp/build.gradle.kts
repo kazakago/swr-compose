@@ -1,14 +1,14 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
-    alias(libs.plugins.kotlin)
-    alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.kotlin.compose.compiler)
-    alias(libs.plugins.jetbrains.compose)
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.kotlinSerialization)
+    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.composeHotReload)
+    alias(libs.plugins.androidApplication)
 }
 
 kotlin {
@@ -29,25 +29,15 @@ kotlin {
         }
     }
 
-    jvm("desktop")
+    jvm()
 
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        outputModuleName = "exampleApp"
-        browser {
-            val rootDirPath = project.rootDir.path
-            val projectDirPath = project.projectDir.path
-            commonWebpackConfig {
-                outputFileName = "exampleApp.js"
-                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
-                    static = (static ?: mutableListOf()).apply {
-                        // Serve sources to debug inside browser
-                        add(rootDirPath)
-                        add(projectDirPath)
-                    }
-                }
-            }
-        }
+        browser()
+        binaries.executable()
+    }
+    js {
+        browser()
         binaries.executable()
     }
 
@@ -59,30 +49,29 @@ kotlin {
             implementation(compose.ui)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
-            implementation(libs.kotlinx.datetime)
-            implementation(libs.kotlinx.serialization.core)
-            implementation(libs.androidx.material3)
-            implementation(libs.androidx.material.icons)
-            implementation(libs.androidx.navigation.compose)
+            implementation(libs.kotlinxDatetime)
+            implementation(libs.kotlinxSerializationCore)
+            implementation(libs.androidxMaterial3)
+            implementation(libs.androidxNavigationCompose)
         }
         androidMain.dependencies {
             implementation(compose.preview)
-            implementation(libs.androidx.activity.compose)
+            implementation(libs.androidxActivityCompose)
         }
-        val desktopMain by getting
-        desktopMain.dependencies {
+        jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
+            implementation(libs.kotlinxCoroutinesSwing)
         }
     }
 }
 
 android {
     namespace = "com.kazakago.swr.example"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
+    compileSdk = libs.versions.androidCompileSdk.get().toInt()
     defaultConfig {
         applicationId = "com.kazakago.swr.example"
-        minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = libs.versions.android.targetSdk.get().toInt()
+        minSdk = libs.versions.androidMinSdk.get().toInt()
+        targetSdk = libs.versions.androidTargetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
     }
