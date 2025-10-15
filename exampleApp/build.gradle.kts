@@ -47,11 +47,11 @@ kotlin {
             implementation(compose.runtime)
             implementation(compose.foundation)
             implementation(compose.ui)
+            implementation(compose.material3)
             implementation(compose.components.resources)
             implementation(compose.components.uiToolingPreview)
             implementation(libs.kotlinxDatetime)
             implementation(libs.kotlinxSerializationCore)
-            implementation(libs.androidxMaterial3)
             implementation(libs.androidxNavigationCompose)
         }
         androidMain.dependencies {
