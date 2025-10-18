@@ -48,8 +48,8 @@ public class SWRStore<KEY : Any, DATA>(
         return dataSelector.refresh()
     }
 
-    public suspend fun update(data: DATA?) {
-        dataSelector.update(data)
+    public suspend fun update(data: DATA?, keepState: Boolean = false) {
+        dataSelector.update(data, keepState)
     }
 
     public suspend fun clear() {

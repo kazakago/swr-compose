@@ -42,6 +42,6 @@ public class SWR<KEY : Any, DATA>(
     public val mutate: SWRMutate<DATA> = SWRMutate(
         get = { from -> swrInternal?.store?.get(from) ?: Result.failure(IllegalStateException("key is null")) },
         validate = { swrInternal?.validate() ?: Result.failure(IllegalStateException("key is null")) },
-        update = { data -> swrInternal?.store?.update(data) },
+        update = { data, keepState -> swrInternal?.store?.update(data, keepState) },
     )
 }

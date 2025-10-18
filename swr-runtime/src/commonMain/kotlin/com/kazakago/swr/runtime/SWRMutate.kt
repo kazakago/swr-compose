@@ -5,7 +5,7 @@ import com.kazakago.swr.store.GettingFrom
 public data class SWRMutate<DATA>(
     private val get: suspend (from: GettingFrom) -> Result<DATA>,
     private val validate: suspend () -> Result<DATA>,
-    private val update: suspend (newData: DATA?) -> Unit,
+    private val update: suspend (newData: DATA?, keepState: Boolean) -> Unit,
 ) {
 
     public suspend operator fun invoke(
@@ -16,20 +16,20 @@ public data class SWRMutate<DATA>(
         val previousData = get(GettingFrom.LocalOnly).getOrNull()
         val optimisticData = currentConfig.optimisticData
         if (optimisticData != null) {
-            update(optimisticData)
+            update(optimisticData, false)
         }
         return runCatching {
             if (data != null) data() else null
         }.onSuccess { newData ->
             if (currentConfig.populateCache && newData != null) {
-                update(newData)
+                update(newData, false)
             }
             if (currentConfig.revalidate) {
                 validate()
             }
         }.onFailure { throwable ->
             if (currentConfig.rollbackOnError) {
-                update(previousData)
+                update(previousData, true)
             }
         }
     }

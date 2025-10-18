@@ -87,12 +87,21 @@ internal class DataSelector<DATA>(
         return validate()
     }
 
-    suspend fun update(data: DATA?) {
+    suspend fun update(data: DATA?, keepState: Boolean) {
         putDataToLocal(data)
-        putState(DataState.Fixed())
+        val newState = if (keepState) {
+            when (val state = getState()) {
+                is DataState.Loading -> DataState.Loading()
+                is DataState.Fixed -> DataState.Fixed()
+                is DataState.Error -> DataState.Error(state.error)
+            }
+        } else {
+            DataState.Fixed()
+        }
+        putState(newState)
     }
 
     suspend fun clear() {
-        update(null)
+        update(null, false)
     }
 }

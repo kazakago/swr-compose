@@ -54,7 +54,7 @@ public class SWRImmutable<KEY : Any, DATA>(
         SWRMutate(
             get = { Result.failure(IllegalStateException("key is null")) },
             validate = { Result.failure(IllegalStateException("key is null")) },
-            update = {},
+            update = { _, _ -> },
         )
     }
 }
