@@ -12,7 +12,7 @@ public sealed class SWRState<DATA> {
             mutate = SWRMutate(
                 get = { Result.failure(NoSuchElementException()) },
                 validate = { Result.failure(NoSuchElementException()) },
-                update = {},
+                update = { _, _ -> },
             ),
         )
     }
