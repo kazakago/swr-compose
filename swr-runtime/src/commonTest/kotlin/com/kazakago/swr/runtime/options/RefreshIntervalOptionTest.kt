@@ -1,9 +1,10 @@
-package com.kazakago.swr.runtime.config
+package com.kazakago.swr.runtime.options
 
 import androidx.lifecycle.testing.TestLifecycleOwner
 import app.cash.turbine.test
 import com.kazakago.swr.runtime.SWR
 import com.kazakago.swr.runtime.internal.TestNetworkMonitor
+import com.kazakago.swr.store.SWRStoreState
 import com.kazakago.swr.store.cache.SWRCacheOwner
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -17,9 +18,10 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class ErrorRetryCountOptionTest {
+class RefreshIntervalOptionTest {
 
     @BeforeTest
     fun setUp() {
@@ -32,54 +34,54 @@ class ErrorRetryCountOptionTest {
     }
 
     @Test
-    fun errorRetryCountNull() = runTest {
-        val errorRetryCountList = mutableListOf<Int?>()
+    fun noRefreshInterval() = runTest {
         val swr = SWR(
             key = "key",
             fetcher = {
                 delay(100)
-                throw IllegalStateException()
+                "data"
             },
             lifecycleOwner = TestLifecycleOwner(),
             scope = backgroundScope,
             cacheOwner = SWRCacheOwner(),
             networkMonitor = TestNetworkMonitor(),
         ) {
-            errorRetryCount = null
-            onErrorRetry = { _, _, config, _, _ ->
-                errorRetryCountList += config.errorRetryCount
-            }
+            refreshInterval = 0.seconds
         }
         swr.stateFlow.test {
-            advanceTimeBy(1000)
-            skipItems(2)
-            assertEquals(listOf<Int?>(null), errorRetryCountList)
+            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
+            advanceTimeBy(101)
+            assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
+            advanceTimeBy(9900)
+            expectNoEvents()
+            advanceTimeBy(101)
+            expectNoEvents()
         }
     }
 
     @Test
-    fun errorRetryCount3() = runTest {
-        val errorRetryCountList = mutableListOf<Int?>()
+    fun withRefreshInterval() = runTest {
         val swr = SWR(
             key = "key",
             fetcher = {
                 delay(100)
-                throw IllegalStateException()
+                "data"
             },
             lifecycleOwner = TestLifecycleOwner(),
             scope = backgroundScope,
             cacheOwner = SWRCacheOwner(),
             networkMonitor = TestNetworkMonitor(),
         ) {
-            errorRetryCount = 3
-            onErrorRetry = { _, _, config, _, _ ->
-                errorRetryCountList += config.errorRetryCount
-            }
+            refreshInterval = 10.seconds
         }
         swr.stateFlow.test {
-            advanceTimeBy(1000)
-            skipItems(2)
-            assertEquals(listOf<Int?>(3), errorRetryCountList)
+            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
+            advanceTimeBy(101)
+            assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
+            advanceTimeBy(9900)
+            assertEquals(SWRStoreState.Loading("data"), expectMostRecentItem())
+            advanceTimeBy(101)
+            assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
         }
     }
 }

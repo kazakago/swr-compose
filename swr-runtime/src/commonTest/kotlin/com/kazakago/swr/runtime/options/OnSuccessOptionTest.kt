@@ -1,4 +1,4 @@
-package com.kazakago.swr.runtime.config
+package com.kazakago.swr.runtime.options
 
 import androidx.lifecycle.testing.TestLifecycleOwner
 import app.cash.turbine.test

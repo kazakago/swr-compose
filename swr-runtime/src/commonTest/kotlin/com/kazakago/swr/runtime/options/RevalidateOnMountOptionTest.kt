@@ -1,9 +1,10 @@
-package com.kazakago.swr.runtime.config
+package com.kazakago.swr.runtime.options
 
 import androidx.lifecycle.testing.TestLifecycleOwner
 import app.cash.turbine.test
 import com.kazakago.swr.runtime.SWR
 import com.kazakago.swr.runtime.internal.TestNetworkMonitor
+import com.kazakago.swr.store.SWRStoreState
 import com.kazakago.swr.store.cache.SWRCacheOwner
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -17,10 +18,9 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class OnLoadingSlowOptionTest {
+class RevalidateOnMountOptionTest {
 
     @BeforeTest
     fun setUp() {
@@ -33,12 +33,11 @@ class OnLoadingSlowOptionTest {
     }
 
     @Test
-    fun withOnLoadingSlow() = runTest {
-        val onLoadingSlowList = mutableListOf<String>()
+    fun withRevalidateOnMount() = runTest {
         val swr = SWR(
             key = "key",
             fetcher = {
-                delay(5.seconds)
+                delay(100)
                 "data"
             },
             lifecycleOwner = TestLifecycleOwner(),
@@ -46,27 +45,22 @@ class OnLoadingSlowOptionTest {
             cacheOwner = SWRCacheOwner(),
             networkMonitor = TestNetworkMonitor(),
         ) {
-            onLoadingSlow = { key, _ ->
-                onLoadingSlowList += key
-            }
+            revalidateOnMount = true
         }
         swr.stateFlow.test {
-            skipItems(1)
-            advanceTimeBy(3000)
-            assertEquals(listOf(), onLoadingSlowList)
-            advanceTimeBy(1)
-            assertEquals(listOf("key"), onLoadingSlowList)
-            skipItems(1)
+            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
+
+            advanceTimeBy(2500)
+            assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
         }
     }
 
     @Test
-    fun noOnLoadingSlow() = runTest {
-        val onLoadingSlowList = mutableListOf<String>()
+    fun noRevalidateOnMount() = runTest {
         val swr = SWR(
             key = "key",
             fetcher = {
-                delay(2.seconds)
+                delay(100)
                 "data"
             },
             lifecycleOwner = TestLifecycleOwner(),
@@ -74,17 +68,13 @@ class OnLoadingSlowOptionTest {
             cacheOwner = SWRCacheOwner(),
             networkMonitor = TestNetworkMonitor(),
         ) {
-            onLoadingSlow = { key, _ ->
-                onLoadingSlowList += key
-            }
+            revalidateOnMount = false
         }
         swr.stateFlow.test {
-            skipItems(1)
-            advanceTimeBy(3000)
-            assertEquals(listOf(), onLoadingSlowList)
-            advanceTimeBy(1)
-            assertEquals(listOf(), onLoadingSlowList)
-            skipItems(1)
+            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
+
+            advanceTimeBy(2500)
+            expectNoEvents()
         }
     }
 }

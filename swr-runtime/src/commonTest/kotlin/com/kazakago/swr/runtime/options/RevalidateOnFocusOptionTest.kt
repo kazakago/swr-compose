@@ -1,5 +1,6 @@
-package com.kazakago.swr.runtime.config
+package com.kazakago.swr.runtime.options
 
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.testing.TestLifecycleOwner
 import app.cash.turbine.test
 import com.kazakago.swr.runtime.SWR
@@ -18,10 +19,9 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class DedupingIntervalOptionTest {
+class RevalidateOnFocusOptionTest {
 
     @BeforeTest
     fun setUp() {
@@ -34,101 +34,66 @@ class DedupingIntervalOptionTest {
     }
 
     @Test
-    fun dedupingInterval2Seconds() = runTest {
+    fun withRevalidateOnFocus() = runTest {
+        val lifecycleOwner = TestLifecycleOwner()
         val swr = SWR(
             key = "key",
             fetcher = {
                 delay(100)
                 "data"
             },
-            lifecycleOwner = TestLifecycleOwner(),
+            lifecycleOwner = lifecycleOwner,
             scope = backgroundScope,
             cacheOwner = SWRCacheOwner(),
             networkMonitor = TestNetworkMonitor(),
         ) {
-            dedupingInterval = 2.seconds
+            revalidateOnFocus = true
         }
         swr.stateFlow.test {
             assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
-
-            advanceTimeBy(1100)
+            advanceTimeBy(2500)
             assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
 
-            swr.mutate()
-
-            advanceTimeBy(1100)
+            lifecycleOwner.setCurrentState(Lifecycle.State.STARTED)
+            advanceTimeBy(100)
             expectNoEvents()
-
-            swr.mutate()
-
-            advanceTimeBy(1100)
+            lifecycleOwner.setCurrentState(Lifecycle.State.RESUMED)
+            advanceTimeBy(1)
+            assertEquals(SWRStoreState.Loading("data"), expectMostRecentItem())
+            advanceTimeBy(2500)
             assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
         }
     }
 
     @Test
-    fun dedupingInterval5Seconds() = runTest {
+    fun noRevalidateOnFocus() = runTest {
+        val lifecycleOwner = TestLifecycleOwner()
         val swr = SWR(
             key = "key",
             fetcher = {
                 delay(100)
                 "data"
             },
-            lifecycleOwner = TestLifecycleOwner(),
+            lifecycleOwner = lifecycleOwner,
             scope = backgroundScope,
             cacheOwner = SWRCacheOwner(),
             networkMonitor = TestNetworkMonitor(),
         ) {
-            dedupingInterval = 5.seconds
+            revalidateOnFocus = false
         }
         swr.stateFlow.test {
             assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
-
-            advanceTimeBy(1100)
+            advanceTimeBy(2500)
             assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
 
-            swr.mutate()
-
-            advanceTimeBy(1100)
+            lifecycleOwner.setCurrentState(Lifecycle.State.STARTED)
+            advanceTimeBy(100)
             expectNoEvents()
-
-            swr.mutate()
-
-            advanceTimeBy(1100)
+            lifecycleOwner.setCurrentState(Lifecycle.State.RESUMED)
+            advanceTimeBy(1)
             expectNoEvents()
-        }
-    }
-
-    @Test
-    fun dedupingInterval0Seconds() = runTest {
-        val swr = SWR(
-            key = "key",
-            fetcher = {
-                delay(100)
-                "data"
-            },
-            lifecycleOwner = TestLifecycleOwner(),
-            scope = backgroundScope,
-            cacheOwner = SWRCacheOwner(),
-            networkMonitor = TestNetworkMonitor(),
-        ) {
-            dedupingInterval = 0.seconds
-        }
-        swr.stateFlow.test {
-            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
-
-            advanceTimeBy(1100)
-            assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
-
-            swr.mutate()
-
-            advanceTimeBy(1100)
-            assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
-
-            swr.mutate()
-
-            advanceTimeBy(1100)
-            assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
+            advanceTimeBy(2500)
+            expectNoEvents()
         }
     }
 }

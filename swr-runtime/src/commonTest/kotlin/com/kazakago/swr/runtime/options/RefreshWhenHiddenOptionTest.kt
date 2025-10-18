@@ -1,5 +1,6 @@
-package com.kazakago.swr.runtime.config
+package com.kazakago.swr.runtime.options
 
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.testing.TestLifecycleOwner
 import app.cash.turbine.test
 import com.kazakago.swr.runtime.SWR
@@ -18,9 +19,10 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class ShouldRetryOnErrorOptionTest {
+class RefreshWhenHiddenOptionTest {
 
     @BeforeTest
     fun setUp() {
@@ -33,66 +35,58 @@ class ShouldRetryOnErrorOptionTest {
     }
 
     @Test
-    fun withShouldRetryOnError() = runTest {
-        val error = IllegalStateException()
-        val swr = SWR<String, String>(
+    fun noRefreshWhenHidden() = runTest {
+        val lifecycleOwner = TestLifecycleOwner(initialState = Lifecycle.State.CREATED)
+        val swr = SWR(
             key = "key",
             fetcher = {
                 delay(100)
-                throw error
+                "data"
             },
-            lifecycleOwner = TestLifecycleOwner(),
+            lifecycleOwner = lifecycleOwner,
             scope = backgroundScope,
             cacheOwner = SWRCacheOwner(),
             networkMonitor = TestNetworkMonitor(),
         ) {
-            shouldRetryOnError = true
-            onErrorRetry = { _, _, _, revalidate, options ->
-                delay(5000)
-                revalidate(options)
-            }
+            refreshInterval = 10.seconds
+            refreshWhenHidden = false
         }
         swr.stateFlow.test {
             assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
             advanceTimeBy(101)
-            assertEquals(SWRStoreState.Error(null, error), expectMostRecentItem())
-
-            advanceTimeBy(5000)
-            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
-            advanceTimeBy(100)
-            assertEquals(SWRStoreState.Error(null, error), expectMostRecentItem())
+            assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
+            advanceTimeBy(9900)
+            expectNoEvents()
+            advanceTimeBy(101)
+            expectNoEvents()
         }
     }
 
     @Test
-    fun noShouldRetryOnError() = runTest {
-        val error = IllegalStateException()
-        val swr = SWR<String, String>(
+    fun withRefreshWhenHidden() = runTest {
+        val lifecycleOwner = TestLifecycleOwner(initialState = Lifecycle.State.CREATED)
+        val swr = SWR(
             key = "key",
             fetcher = {
                 delay(100)
-                throw error
+                "data"
             },
-            lifecycleOwner = TestLifecycleOwner(),
+            lifecycleOwner = lifecycleOwner,
             scope = backgroundScope,
             cacheOwner = SWRCacheOwner(),
             networkMonitor = TestNetworkMonitor(),
         ) {
-            shouldRetryOnError = false
-            onErrorRetry = { _, _, _, revalidate, options ->
-                delay(5000)
-                revalidate(options)
-            }
+            refreshInterval = 10.seconds
+            refreshWhenHidden = true
         }
         swr.stateFlow.test {
             assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
             advanceTimeBy(101)
-            assertEquals(SWRStoreState.Error(null, error), expectMostRecentItem())
-
-            advanceTimeBy(5000)
-            expectNoEvents()
-            advanceTimeBy(100)
-            expectNoEvents()
+            assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
+            advanceTimeBy(9900)
+            assertEquals(SWRStoreState.Loading("data"), expectMostRecentItem())
+            advanceTimeBy(101)
+            assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
         }
     }
 }

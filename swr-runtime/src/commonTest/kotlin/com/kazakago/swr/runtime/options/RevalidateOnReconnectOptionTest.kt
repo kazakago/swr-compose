@@ -1,4 +1,4 @@
-package com.kazakago.swr.runtime.config
+package com.kazakago.swr.runtime.options
 
 import androidx.lifecycle.testing.TestLifecycleOwner
 import app.cash.turbine.test
@@ -14,14 +14,13 @@ import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlin.math.exp
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class OnErrorRetryOptionTest {
+class RevalidateOnReconnectOptionTest {
 
     @BeforeTest
     fun setUp() {
@@ -34,63 +33,64 @@ class OnErrorRetryOptionTest {
     }
 
     @Test
-    fun defaultOnErrorRetry() = runTest {
-        val error = IllegalStateException()
+    fun withRevalidateOnReconnect() = runTest {
+        val networkMonitor = TestNetworkMonitor()
         val swr = SWR(
             key = "key",
             fetcher = {
                 delay(100)
-                throw error
+                "data"
             },
             lifecycleOwner = TestLifecycleOwner(),
             scope = backgroundScope,
             cacheOwner = SWRCacheOwner(),
-            networkMonitor = TestNetworkMonitor(),
-        )
+            networkMonitor = networkMonitor,
+        ) {
+            revalidateOnReconnect = true
+        }
         swr.stateFlow.test {
             assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
-            advanceTimeBy(100)
-            expectNoEvents()
-            advanceTimeBy(15000)
-            assertEquals(SWRStoreState.Error(null, error), expectMostRecentItem())
+            advanceTimeBy(2500)
+            assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
+
+            networkMonitor.onlineStatus.value = false
+            advanceTimeBy(1)
+            networkMonitor.onlineStatus.value = true
+            advanceTimeBy(1)
+            assertEquals(SWRStoreState.Loading("data"), expectMostRecentItem())
+            advanceTimeBy(2500)
+            assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
         }
     }
 
     @Test
-    fun customOnErrorRetry() = runTest {
-        val error = IllegalStateException()
+    fun noRevalidateOnReconnect() = runTest {
+        val networkMonitor = TestNetworkMonitor()
         val swr = SWR(
             key = "key",
             fetcher = {
                 delay(100)
-                throw error
+                "data"
             },
             lifecycleOwner = TestLifecycleOwner(),
             scope = backgroundScope,
             cacheOwner = SWRCacheOwner(),
-            networkMonitor = TestNetworkMonitor(),
+            networkMonitor = networkMonitor,
         ) {
-            onErrorRetry = { _, _, _, revalidate, options ->
-                delay(100)
-                revalidate(options)
-            }
+            revalidateOnReconnect = false
         }
         swr.stateFlow.test {
             assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
-            advanceTimeBy(101)
-            assertEquals(SWRStoreState.Error(null, error), expectMostRecentItem())
-            advanceTimeBy(100)
-            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
-            advanceTimeBy(100)
-            assertEquals(SWRStoreState.Error(null, error), expectMostRecentItem())
-            advanceTimeBy(100)
-            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
-            advanceTimeBy(100)
-            assertEquals(SWRStoreState.Error(null, error), expectMostRecentItem())
-            advanceTimeBy(100)
-            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
-            advanceTimeBy(100)
-            assertEquals(SWRStoreState.Error(null, error), expectMostRecentItem())
+            advanceTimeBy(2500)
+            assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
+
+            networkMonitor.onlineStatus.value = false
+            advanceTimeBy(1)
+            networkMonitor.onlineStatus.value = true
+            advanceTimeBy(1)
+            expectNoEvents()
+            advanceTimeBy(2500)
+            expectNoEvents()
         }
     }
 }

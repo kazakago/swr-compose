@@ -1,11 +1,11 @@
-package com.kazakago.swr.runtime.config
+package com.kazakago.swr.runtime.options
 
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.testing.TestLifecycleOwner
 import app.cash.turbine.test
 import com.kazakago.swr.runtime.SWR
 import com.kazakago.swr.runtime.internal.TestNetworkMonitor
 import com.kazakago.swr.store.SWRStoreState
+import com.kazakago.swr.store.cache.SWRCache
 import com.kazakago.swr.store.cache.SWRCacheOwner
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -19,10 +19,9 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.time.Duration.Companion.seconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class RefreshWhenHiddenOptionTest {
+class RevalidateIfStaleOptionTest {
 
     @BeforeTest
     fun setUp() {
@@ -35,58 +34,64 @@ class RefreshWhenHiddenOptionTest {
     }
 
     @Test
-    fun noRefreshWhenHidden() = runTest {
-        val lifecycleOwner = TestLifecycleOwner(initialState = Lifecycle.State.CREATED)
+    fun withRevalidateIfStale() = runTest {
+        val cacheKey = "key"
+        val cacheOwner = SWRCacheOwner().apply {
+            cacheMap[cacheKey] = SWRCache().apply {
+                data = "cache"
+            }
+        }
         val swr = SWR(
-            key = "key",
+            key = cacheKey,
             fetcher = {
                 delay(100)
                 "data"
             },
-            lifecycleOwner = lifecycleOwner,
+            lifecycleOwner = TestLifecycleOwner(),
             scope = backgroundScope,
-            cacheOwner = SWRCacheOwner(),
+            cacheOwner = cacheOwner,
             networkMonitor = TestNetworkMonitor(),
         ) {
-            refreshInterval = 10.seconds
-            refreshWhenHidden = false
+            revalidateIfStale = true
         }
         swr.stateFlow.test {
             assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
-            advanceTimeBy(101)
+            advanceTimeBy(1)
+            assertEquals(SWRStoreState.Loading("cache"), expectMostRecentItem())
+
+            advanceTimeBy(2500)
             assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
-            advanceTimeBy(9900)
-            expectNoEvents()
-            advanceTimeBy(101)
-            expectNoEvents()
         }
     }
 
     @Test
-    fun withRefreshWhenHidden() = runTest {
-        val lifecycleOwner = TestLifecycleOwner(initialState = Lifecycle.State.CREATED)
+    fun noRevalidateIfStale() = runTest {
+        val cacheKey = "key"
+        val cacheOwner = SWRCacheOwner().apply {
+            cacheMap[cacheKey] = SWRCache().apply {
+                data = "cache"
+            }
+        }
         val swr = SWR(
-            key = "key",
+            key = cacheKey,
             fetcher = {
                 delay(100)
                 "data"
             },
-            lifecycleOwner = lifecycleOwner,
+            lifecycleOwner = TestLifecycleOwner(),
             scope = backgroundScope,
-            cacheOwner = SWRCacheOwner(),
+            cacheOwner = cacheOwner,
             networkMonitor = TestNetworkMonitor(),
         ) {
-            refreshInterval = 10.seconds
-            refreshWhenHidden = true
+            revalidateIfStale = false
         }
         swr.stateFlow.test {
             assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
-            advanceTimeBy(101)
-            assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
-            advanceTimeBy(9900)
-            assertEquals(SWRStoreState.Loading("data"), expectMostRecentItem())
-            advanceTimeBy(101)
-            assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
+            advanceTimeBy(1)
+            assertEquals(SWRStoreState.Completed("cache"), expectMostRecentItem())
+
+            advanceTimeBy(2500)
+            expectNoEvents()
         }
     }
 }

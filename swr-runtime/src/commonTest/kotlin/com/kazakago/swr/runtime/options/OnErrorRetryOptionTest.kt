@@ -1,4 +1,4 @@
-package com.kazakago.swr.runtime.config
+package com.kazakago.swr.runtime.options
 
 import androidx.lifecycle.testing.TestLifecycleOwner
 import app.cash.turbine.test
@@ -20,7 +20,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class FallbackDataOptionTest {
+class OnErrorRetryOptionTest {
 
     @BeforeTest
     fun setUp() {
@@ -33,50 +33,63 @@ class FallbackDataOptionTest {
     }
 
     @Test
-    fun noFallbackData() = runTest {
+    fun defaultOnErrorRetry() = runTest {
+        val error = IllegalStateException()
         val swr = SWR(
             key = "key",
             fetcher = {
                 delay(100)
-                "data"
+                throw error
             },
             lifecycleOwner = TestLifecycleOwner(),
             scope = backgroundScope,
             cacheOwner = SWRCacheOwner(),
             networkMonitor = TestNetworkMonitor(),
-        ) {
-            fallbackData = null
-        }
+        )
         swr.stateFlow.test {
             assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
-            advanceTimeBy(1)
+            advanceTimeBy(100)
             expectNoEvents()
-            advanceTimeBy(1000)
-            assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
+            advanceTimeBy(15000)
+            assertEquals(SWRStoreState.Error(null, error), expectMostRecentItem())
         }
     }
 
     @Test
-    fun withFallbackData() = runTest {
+    fun customOnErrorRetry() = runTest {
+        val error = IllegalStateException()
         val swr = SWR(
             key = "key",
             fetcher = {
                 delay(100)
-                "data"
+                throw error
             },
             lifecycleOwner = TestLifecycleOwner(),
             scope = backgroundScope,
             cacheOwner = SWRCacheOwner(),
             networkMonitor = TestNetworkMonitor(),
         ) {
-            fallbackData = "fallback"
+            onErrorRetry = { _, _, _, revalidate, options ->
+                delay(100)
+                revalidate(options)
+            }
         }
         swr.stateFlow.test {
             assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
-            advanceTimeBy(1)
-            assertEquals(SWRStoreState.Loading("fallback"), expectMostRecentItem())
-            advanceTimeBy(1000)
-            assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
+            advanceTimeBy(101)
+            assertEquals(SWRStoreState.Error(null, error), expectMostRecentItem())
+            advanceTimeBy(100)
+            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
+            advanceTimeBy(100)
+            assertEquals(SWRStoreState.Error(null, error), expectMostRecentItem())
+            advanceTimeBy(100)
+            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
+            advanceTimeBy(100)
+            assertEquals(SWRStoreState.Error(null, error), expectMostRecentItem())
+            advanceTimeBy(100)
+            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
+            advanceTimeBy(100)
+            assertEquals(SWRStoreState.Error(null, error), expectMostRecentItem())
         }
     }
 }

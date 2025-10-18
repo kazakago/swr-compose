@@ -1,11 +1,9 @@
-package com.kazakago.swr.runtime.config
+package com.kazakago.swr.runtime.options
 
 import androidx.lifecycle.testing.TestLifecycleOwner
 import app.cash.turbine.test
 import com.kazakago.swr.runtime.SWR
 import com.kazakago.swr.runtime.internal.TestNetworkMonitor
-import com.kazakago.swr.store.SWRStoreState
-import com.kazakago.swr.store.cache.SWRCache
 import com.kazakago.swr.store.cache.SWRCacheOwner
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -21,7 +19,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class RevalidateIfStaleOptionTest {
+class ErrorRetryCountOptionTest {
 
     @BeforeTest
     fun setUp() {
@@ -34,64 +32,54 @@ class RevalidateIfStaleOptionTest {
     }
 
     @Test
-    fun withRevalidateIfStale() = runTest {
-        val cacheKey = "key"
-        val cacheOwner = SWRCacheOwner().apply {
-            cacheMap[cacheKey] = SWRCache().apply {
-                data = "cache"
-            }
-        }
+    fun errorRetryCountNull() = runTest {
+        val errorRetryCountList = mutableListOf<Int?>()
         val swr = SWR(
-            key = cacheKey,
+            key = "key",
             fetcher = {
                 delay(100)
-                "data"
+                throw IllegalStateException()
             },
             lifecycleOwner = TestLifecycleOwner(),
             scope = backgroundScope,
-            cacheOwner = cacheOwner,
+            cacheOwner = SWRCacheOwner(),
             networkMonitor = TestNetworkMonitor(),
         ) {
-            revalidateIfStale = true
+            errorRetryCount = null
+            onErrorRetry = { _, _, config, _, _ ->
+                errorRetryCountList += config.errorRetryCount
+            }
         }
         swr.stateFlow.test {
-            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
-            advanceTimeBy(1)
-            assertEquals(SWRStoreState.Loading("cache"), expectMostRecentItem())
-
-            advanceTimeBy(2500)
-            assertEquals(SWRStoreState.Completed("data"), expectMostRecentItem())
+            advanceTimeBy(1000)
+            skipItems(2)
+            assertEquals(listOf<Int?>(null), errorRetryCountList)
         }
     }
 
     @Test
-    fun noRevalidateIfStale() = runTest {
-        val cacheKey = "key"
-        val cacheOwner = SWRCacheOwner().apply {
-            cacheMap[cacheKey] = SWRCache().apply {
-                data = "cache"
-            }
-        }
+    fun errorRetryCount3() = runTest {
+        val errorRetryCountList = mutableListOf<Int?>()
         val swr = SWR(
-            key = cacheKey,
+            key = "key",
             fetcher = {
                 delay(100)
-                "data"
+                throw IllegalStateException()
             },
             lifecycleOwner = TestLifecycleOwner(),
             scope = backgroundScope,
-            cacheOwner = cacheOwner,
+            cacheOwner = SWRCacheOwner(),
             networkMonitor = TestNetworkMonitor(),
         ) {
-            revalidateIfStale = false
+            errorRetryCount = 3
+            onErrorRetry = { _, _, config, _, _ ->
+                errorRetryCountList += config.errorRetryCount
+            }
         }
         swr.stateFlow.test {
-            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
-            advanceTimeBy(1)
-            assertEquals(SWRStoreState.Completed("cache"), expectMostRecentItem())
-
-            advanceTimeBy(2500)
-            expectNoEvents()
+            advanceTimeBy(1000)
+            skipItems(2)
+            assertEquals(listOf<Int?>(3), errorRetryCountList)
         }
     }
 }
