@@ -50,7 +50,7 @@ class OptimisticOptionTest {
         )
         swr.stateFlow.test {
             assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
-            advanceTimeBy(100)
+            advanceTimeBy(101)
             assertEquals(SWRStoreState.Completed("fetched_1"), expectMostRecentItem())
 
             advanceTimeBy(2500)
