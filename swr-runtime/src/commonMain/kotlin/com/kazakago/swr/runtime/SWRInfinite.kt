@@ -29,9 +29,9 @@ public class SWRInfinite<KEY : Any, DATA>(
     defaultConfig: SWRConfig<Any, Any> = defaultSWRConfig,
     config: SWRConfig<KEY, DATA>.() -> Unit = {},
 ) {
-    private val currentConfig = SWRConfig<KEY, DATA>(defaultConfig).apply(config)
+    private val initialConfig = SWRConfig<KEY, DATA>(defaultConfig).apply(config)
     private var swrList: List<SWRInternal<KEY, DATA>?> = emptyList()
-    public var pageSize: MutableStateFlow<Int> = MutableStateFlow(currentConfig.initialSize)
+    public var pageSize: MutableStateFlow<Int> = MutableStateFlow(initialConfig.initialSize)
     public var previousFirstKey: KEY? = null
 
     init {
@@ -40,10 +40,11 @@ public class SWRInfinite<KEY : Any, DATA>(
                 swrList = buildList {
                     var previousPageData: DATA? = null
                     repeat(pageSize) { pageIndex ->
-                        currentConfig.apply {
-                            revalidateIfStale = revalidateIfStale && (currentConfig.revalidateAll || (currentConfig.revalidateFirstPage && pageIndex == 0))
-                            revalidateOnFocus = revalidateOnFocus && (currentConfig.revalidateAll || (currentConfig.revalidateFirstPage && pageIndex == 0))
-                            revalidateOnReconnect = revalidateOnReconnect && (currentConfig.revalidateAll || (currentConfig.revalidateFirstPage && pageIndex == 0))
+                        @Suppress("UNCHECKED_CAST")
+                        val currentConfig = SWRConfig<KEY, DATA>(initialConfig as SWRConfig<Any, Any>).apply {
+                            revalidateIfStale = revalidateIfStale && (revalidateAll || (revalidateFirstPage && pageIndex == 0))
+                            revalidateOnFocus = revalidateOnFocus && (revalidateAll || (revalidateFirstPage && pageIndex == 0))
+                            revalidateOnReconnect = revalidateOnReconnect && (revalidateAll || (revalidateFirstPage && pageIndex == 0))
                         }
                         val key = getKey(pageIndex, previousPageData)
                         if (!currentConfig.persistSize && pageIndex == 0) {
@@ -56,9 +57,15 @@ public class SWRInfinite<KEY : Any, DATA>(
                             }
                         }
                         if (key != null) {
-                            val store = SWRStore(key, fetcher, persister, cacheOwner)
-                            previousPageData = store.get(from = GettingFrom.LocalOnly).getOrNull()
-                            add(SWRInternal(store, lifecycleOwner, scope, networkMonitor, currentConfig))
+                            val swr = swrList.getOrNull(pageIndex)
+                            if (swr != null) {
+                                previousPageData = null
+                                add(swr)
+                            } else {
+                                val store = SWRStore(key, fetcher, persister, cacheOwner)
+                                previousPageData = store.get(from = GettingFrom.LocalOnly).getOrNull()
+                                add(SWRInternal(store, lifecycleOwner, scope, networkMonitor, currentConfig))
+                            }
                         } else {
                             add(null)
                         }
