@@ -1,4 +1,8 @@
+rootProject.name = "swr"
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google {
             mavenContent {
@@ -24,9 +28,11 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "swr_compose"
-include(":composeApp")
-include(":swr")
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}
 
-// https://docs.gradle.org/current/userguide/declaring_dependencies.html#sec:type-safe-project-accessors
-enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+include(":exampleApp")
+include(":swr-store")
+include(":swr-runtime")
+include(":swr-compose")
