@@ -49,8 +49,8 @@ public class SWRInfinite<KEY : Any, DATA>(
                         val key = getKey(pageIndex, previousPageData)
                         if (!currentConfig.persistSize && pageIndex == 0) {
                             if (previousFirstKey != null && previousFirstKey != key) {
-                                this@SWRInfinite.pageSize.value = currentConfig.initialSize
                                 previousFirstKey = null
+                                this@SWRInfinite.pageSize.value = currentConfig.initialSize
                                 return@collect
                             } else {
                                 previousFirstKey = key
@@ -58,7 +58,7 @@ public class SWRInfinite<KEY : Any, DATA>(
                         }
                         if (key != null) {
                             val swr = swrList.getOrNull(pageIndex)
-                            if (swr != null) {
+                            if (swr != null && swr.store.key == key) {
                                 previousPageData = null
                                 add(swr)
                             } else {
