@@ -70,7 +70,7 @@ fun AutoRevalidationScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it),
-            contentAlignment = Alignment.Companion.TopCenter,
+            contentAlignment = Alignment.TopCenter,
         ) {
             if (data == null) {
                 LoadingContent()
@@ -80,7 +80,7 @@ fun AutoRevalidationScreen(
                 }
                 Box(
                     modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Companion.Center
+                    contentAlignment = Alignment.Center
                 ) {
                     Text(data)
                 }

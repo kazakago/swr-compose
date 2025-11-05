@@ -65,7 +65,7 @@ fun ConditionalFetchingScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it),
-            contentAlignment = Alignment.Companion.Center,
+            contentAlignment = Alignment.Center,
         ) {
             if (user == null) {
                 LoadingContent()
@@ -73,7 +73,7 @@ fun ConditionalFetchingScreen(
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.Companion.CenterHorizontally,
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(user)
                     if (projects == null) {

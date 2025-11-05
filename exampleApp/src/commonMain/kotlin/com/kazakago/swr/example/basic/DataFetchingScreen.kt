@@ -56,7 +56,7 @@ fun DataFetchingScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it),
-            contentAlignment = Alignment.Companion.Center,
+            contentAlignment = Alignment.Center,
         ) {
             if (error != null) {
                 ErrorContent()

@@ -59,7 +59,7 @@ fun ArgumentsScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it),
-            contentAlignment = Alignment.Companion.Center,
+            contentAlignment = Alignment.Center,
         ) {
             if (data1 == null || data2 == null) {
                 LoadingContent()
@@ -67,7 +67,7 @@ fun ArgumentsScreen(
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.Companion.CenterHorizontally,
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(data1)
                     Text(data2)

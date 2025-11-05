@@ -26,11 +26,11 @@ fun ErrorContent(
             .fillMaxSize()
             .padding(16.dp),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.Companion.CenterHorizontally,
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = "Validation failed.",
-            textAlign = TextAlign.Companion.Center,
+            textAlign = TextAlign.Center,
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.error,
         )
