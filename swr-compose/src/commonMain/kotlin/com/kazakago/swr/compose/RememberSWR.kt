@@ -2,8 +2,8 @@ package com.kazakago.swr.compose
 
 import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.retain.retain
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -30,7 +30,7 @@ public fun <KEY : Any, DATA> rememberSWR(
         val defaultConfig = LocalSWRConfig.current
         val lifecycleOwner = LocalLifecycleOwner.current
         val networkMonitor = networkMonitor ?: buildNetworkMonitor()
-        val swr = remember(key) {
+        val swr = retain(key) {
             SWR(
                 key = key,
                 fetcher = fetcher,

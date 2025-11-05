@@ -1,22 +1,17 @@
 package com.kazakago.swr.example
 
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.navigation.NavController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import androidx.compose.ui.Modifier
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.ui.NavDisplay
+import androidx.savedstate.serialization.SavedStateConfiguration
 import com.kazakago.swr.example.basic.ArgumentsRoute
 import com.kazakago.swr.example.basic.ArgumentsScreen
 import com.kazakago.swr.example.basic.AutoRevalidationRoute
@@ -44,115 +39,123 @@ import com.kazakago.swr.example.todolist.ToDoListScreen
 import com.kazakago.swr.example.todolist.server.LocalMockServer
 import com.kazakago.swr.example.todolist.server.MockServer
 import com.kazakago.swr.example.todolist.server.MockServerSucceed
+import kotlinx.serialization.modules.SerializersModule
+import kotlinx.serialization.modules.polymorphic
 
 @Composable
 fun App(
-    onNavHostReady: suspend (NavController) -> Unit = {},
+    modifier: Modifier = Modifier,
 ) = MaterialTheme {
-    val navController = rememberNavController()
     val scope = rememberCoroutineScope()
     val mockServer = remember { mutableStateOf<MockServer>(MockServerSucceed) }
     val isClearCache = remember { mutableStateOf(true) }
-    LaunchedEffect(navController) {
-        onNavHostReady(navController)
-    }
-    CompositionLocalProvider(LocalMockServer provides mockServer.value) {
-        NavHost(
-            navController = navController,
-            startDestination = MainRoute,
-            enterTransition = {
-                slideInHorizontally(initialOffsetX = { 100 }) + fadeIn()
-            },
-            exitTransition = {
-                ExitTransition.None
-            },
-            popEnterTransition = {
-                EnterTransition.None
-            },
-            popExitTransition = {
-                slideOutHorizontally(targetOffsetX = { 100 }) + fadeOut()
-            },
-        ) {
-            composable<MainRoute> {
-                MainScreen(
-                    mockServer = mockServer,
-                    isClearCache = isClearCache,
-                    moveToDataFetching = { navController.navigate(DataFetchingRoute) },
-                    moveToGlobalConfiguration = { navController.navigate(GlobalConfigurationRoute) },
-                    moveToErrorHandling = { navController.navigate(ErrorHandlingRoute) },
-                    moveToAutoRevalidation = { navController.navigate(AutoRevalidationRoute) },
-                    moveToConditionalFetching = { navController.navigate(ConditionalFetchingRoute) },
-                    moveToArguments = { navController.navigate(ArgumentsRoute) },
-                    moveToMutation = { navController.navigate(MutationRoute) },
-                    moveToPagination = { navController.navigate(PaginationRoute) },
-                    moveToInfinitePagination = { navController.navigate(InfinitePaginationRoute) },
-                    moveToPrefetching = { navController.navigate(PrefetchingRoute) },
-                    moveToTodoList = { navController.navigate(ToDoListRoute) },
-                )
-            }
-            composable<DataFetchingRoute> {
-                DataFetchingScreen(
-                    onBack = navController::popBackStack,
-                )
-            }
-            composable<GlobalConfigurationRoute> {
-                GlobalConfigurationScreen(
-                    onBack = navController::popBackStack,
-                )
-            }
-            composable<ErrorHandlingRoute> {
-                ErrorHandlingScreen(
-                    onBack = navController::popBackStack,
-                )
-            }
-            composable<AutoRevalidationRoute> {
-                AutoRevalidationScreen(
-                    onBack = navController::popBackStack,
-                )
-            }
-            composable<ConditionalFetchingRoute> {
-                ConditionalFetchingScreen(
-                    onBack = navController::popBackStack,
-                )
-            }
-            composable<ArgumentsRoute> {
-                ArgumentsScreen(
-                    onBack = navController::popBackStack,
-                )
-            }
-            composable<MutationRoute> {
-                MutationScreen(
-                    onBack = navController::popBackStack,
-                )
-            }
-            composable<ToDoListRoute> {
-                ToDoListScreen(
-                    onBack = navController::popBackStack,
-                )
-            }
-            composable<PaginationRoute> {
-                PaginationScreen(
-                    onBack = navController::popBackStack,
-                )
-            }
-            composable<InfinitePaginationRoute> {
-                InfinitePaginationScreen(
-                    onBack = navController::popBackStack,
-                )
-            }
-            composable<PrefetchingRoute> {
-                PrefetchingScreen(
-                    onBack = navController::popBackStack,
-                    toNext = { navController.navigate(PrefetchingNextRoute) },
-                    scope = scope,
-                )
-            }
-            composable<PrefetchingNextRoute> {
-                PrefetchingNextScreen(
-                    onBack = navController::popBackStack,
-                    scope = scope,
-                )
+    val config = SavedStateConfiguration {
+        serializersModule = SerializersModule {
+            polymorphic(NavKey::class) {
+                subclass(MainRoute::class, MainRoute.serializer())
+                subclass(DataFetchingRoute::class, DataFetchingRoute.serializer())
+                subclass(GlobalConfigurationRoute::class, GlobalConfigurationRoute.serializer())
+                subclass(ErrorHandlingRoute::class, ErrorHandlingRoute.serializer())
+                subclass(AutoRevalidationRoute::class, AutoRevalidationRoute.serializer())
+                subclass(ConditionalFetchingRoute::class, ConditionalFetchingRoute.serializer())
+                subclass(ArgumentsRoute::class, ArgumentsRoute.serializer())
+                subclass(MutationRoute::class, MutationRoute.serializer())
+                subclass(PaginationRoute::class, PaginationRoute.serializer())
+                subclass(InfinitePaginationRoute::class, InfinitePaginationRoute.serializer())
+                subclass(PrefetchingRoute::class, PrefetchingRoute.serializer())
+                subclass(ToDoListRoute::class, ToDoListRoute.serializer())
             }
         }
+    }
+    val backStack = rememberNavBackStack(config, MainRoute)
+    val entryProvider = entryProvider {
+        entry<MainRoute> {
+            MainScreen(
+                mockServer = mockServer,
+                isClearCache = isClearCache,
+                moveToDataFetching = { backStack.add(DataFetchingRoute) },
+                moveToGlobalConfiguration = { backStack.add(GlobalConfigurationRoute) },
+                moveToErrorHandling = { backStack.add(ErrorHandlingRoute) },
+                moveToAutoRevalidation = { backStack.add(AutoRevalidationRoute) },
+                moveToConditionalFetching = { backStack.add(ConditionalFetchingRoute) },
+                moveToArguments = { backStack.add(ArgumentsRoute) },
+                moveToMutation = { backStack.add(MutationRoute) },
+                moveToPagination = { backStack.add(PaginationRoute) },
+                moveToInfinitePagination = { backStack.add(InfinitePaginationRoute) },
+                moveToPrefetching = { backStack.add(PrefetchingRoute) },
+                moveToTodoList = { backStack.add(ToDoListRoute) },
+            )
+        }
+        entry<DataFetchingRoute> {
+            DataFetchingScreen(
+                onBack = backStack::removeLastOrNull,
+            )
+        }
+        entry<GlobalConfigurationRoute> {
+            GlobalConfigurationScreen(
+                onBack = backStack::removeLastOrNull,
+            )
+        }
+        entry<ErrorHandlingRoute> {
+            ErrorHandlingScreen(
+                onBack = backStack::removeLastOrNull,
+            )
+        }
+        entry<AutoRevalidationRoute> {
+            AutoRevalidationScreen(
+                onBack = backStack::removeLastOrNull,
+            )
+        }
+        entry<ConditionalFetchingRoute> {
+            ConditionalFetchingScreen(
+                onBack = backStack::removeLastOrNull,
+            )
+        }
+        entry<ArgumentsRoute> {
+            ArgumentsScreen(
+                onBack = backStack::removeLastOrNull,
+            )
+        }
+        entry<MutationRoute> {
+            MutationScreen(
+                onBack = backStack::removeLastOrNull,
+            )
+        }
+        entry<ToDoListRoute> {
+            ToDoListScreen(
+                onBack = backStack::removeLastOrNull,
+            )
+        }
+        entry<PaginationRoute> {
+            PaginationScreen(
+                onBack = backStack::removeLastOrNull,
+            )
+        }
+        entry<InfinitePaginationRoute> {
+            InfinitePaginationScreen(
+                onBack = backStack::removeLastOrNull,
+            )
+        }
+        entry<PrefetchingRoute> {
+            PrefetchingScreen(
+                onBack = backStack::removeLastOrNull,
+                toNext = { backStack.add(PrefetchingNextRoute) },
+                scope = scope,
+            )
+        }
+        entry<PrefetchingNextRoute> {
+            PrefetchingNextScreen(
+                onBack = backStack::removeLastOrNull,
+                scope = scope,
+            )
+        }
+    }
+    CompositionLocalProvider(LocalMockServer provides mockServer.value) {
+        NavDisplay(
+            modifier = modifier,
+            backStack = backStack,
+            onBack = { backStack.removeLastOrNull() },
+            entryProvider = entryProvider,
+        )
     }
 }

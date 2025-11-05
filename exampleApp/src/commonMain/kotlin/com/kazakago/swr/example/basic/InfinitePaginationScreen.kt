@@ -21,14 +21,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation3.runtime.NavKey
 import com.kazakago.swr.compose.rememberSWRInfinite
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import swr.exampleapp.generated.resources.Res
 import swr.exampleapp.generated.resources.arrow_back_24dp
 import swr.exampleapp.generated.resources.refresh_24dp
@@ -46,7 +47,7 @@ private val getKey: (pageIndex: Int, previousPageData: List<String>?) -> String?
 
 @SerialName("infinite_pagination")
 @Serializable
-data object InfinitePaginationRoute
+data object InfinitePaginationRoute : NavKey
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)

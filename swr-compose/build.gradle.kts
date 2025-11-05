@@ -39,7 +39,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             api(projects.swrRuntime)
-            implementation(compose.ui)
+            implementation(libs.composeUi)
             implementation(libs.kotlinxCoroutinesCore)
             implementation(libs.androidxLifecycleRuntimeCompose)
         }

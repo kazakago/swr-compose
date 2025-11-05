@@ -28,7 +28,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation3.runtime.NavKey
 import com.kazakago.swr.compose.rememberSWR
 import com.kazakago.swr.example.todolist.server.LocalMockServer
 import com.kazakago.swr.example.ui.ErrorContent
@@ -37,7 +39,6 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import swr.exampleapp.generated.resources.Res
 import swr.exampleapp.generated.resources.add_24dp
 import swr.exampleapp.generated.resources.arrow_back_24dp
@@ -45,7 +46,7 @@ import swr.exampleapp.generated.resources.refresh_24dp
 
 @SerialName("todo_list")
 @Serializable
-data object ToDoListRoute
+data object ToDoListRoute : NavKey
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)

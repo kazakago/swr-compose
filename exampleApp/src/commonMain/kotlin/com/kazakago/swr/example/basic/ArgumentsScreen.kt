@@ -15,13 +15,14 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation3.runtime.NavKey
 import com.kazakago.swr.compose.rememberSWR
 import com.kazakago.swr.example.ui.LoadingContent
 import kotlinx.coroutines.delay
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.ui.tooling.preview.Preview
 import swr.exampleapp.generated.resources.Res
 import swr.exampleapp.generated.resources.arrow_back_24dp
 import kotlin.time.Duration.Companion.seconds
@@ -33,7 +34,7 @@ private val fetcher: suspend (key: String) -> String = { key ->
 
 @SerialName("arguments")
 @Serializable
-data object ArgumentsRoute
+data object ArgumentsRoute : NavKey
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)

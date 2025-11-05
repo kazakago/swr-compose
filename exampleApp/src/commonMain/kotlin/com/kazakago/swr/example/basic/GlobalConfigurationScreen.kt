@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.navigation3.runtime.NavKey
 import com.kazakago.swr.compose.SWRConfig
 import com.kazakago.swr.compose.rememberSWR
 import com.kazakago.swr.example.ui.LoadingContent
@@ -35,7 +36,7 @@ private val fetcher: suspend (key: String) -> String = {
 
 @SerialName("global_configuration")
 @Serializable
-data object GlobalConfigurationRoute
+data object GlobalConfigurationRoute : NavKey
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)

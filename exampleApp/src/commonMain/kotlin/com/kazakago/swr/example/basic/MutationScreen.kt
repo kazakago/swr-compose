@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.navigation3.runtime.NavKey
 import com.kazakago.swr.compose.rememberSWR
 import com.kazakago.swr.example.ui.LoadingContent
 import kotlinx.coroutines.delay
@@ -39,7 +40,7 @@ private val mutator: suspend () -> String = {
 
 @SerialName("mutation")
 @Serializable
-data object MutationRoute
+data object MutationRoute : NavKey
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)

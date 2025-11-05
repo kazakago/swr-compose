@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.navigation3.runtime.NavKey
 import com.kazakago.swr.compose.rememberSWR
 import com.kazakago.swr.example.ui.ErrorContent
 import com.kazakago.swr.example.ui.LoadingContent
@@ -35,7 +36,7 @@ private val fetcher: suspend (key: String) -> String = {
 
 @SerialName("error_handling")
 @Serializable
-data object ErrorHandlingRoute
+data object ErrorHandlingRoute : NavKey
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)

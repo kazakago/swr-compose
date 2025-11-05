@@ -7,7 +7,6 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.composeHotReload)
     alias(libs.plugins.androidApplication)
 }
 
@@ -44,18 +43,14 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             implementation(projects.swrCompose)
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.ui)
-            implementation(compose.material3)
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
+            implementation(libs.composeMaterial3)
+            implementation(libs.composePreview)
+            implementation(libs.composeResources)
             implementation(libs.kotlinxDatetime)
             implementation(libs.kotlinxSerializationCore)
-            implementation(libs.androidxNavigationCompose)
+            implementation(libs.androidxNavigation3Ui)
         }
         androidMain.dependencies {
-            implementation(compose.preview)
             implementation(libs.androidxActivityCompose)
         }
         jvmMain.dependencies {
@@ -99,5 +94,5 @@ compose.desktop {
 }
 
 dependencies {
-    debugImplementation(compose.uiTooling)
+    debugImplementation(libs.composeUiTooling)
 }

@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation3.runtime.NavKey
 import com.kazakago.swr.compose.rememberSWR
 import com.kazakago.swr.compose.rememberSWRPreload
 import com.kazakago.swr.example.ui.LoadingContent
@@ -37,7 +38,7 @@ private val fetcher: suspend (key: String) -> String = {
 
 @SerialName("prefetching")
 @Serializable
-data object PrefetchingRoute
+data object PrefetchingRoute : NavKey
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -79,7 +80,7 @@ fun PrefetchingScreen(
 
 @SerialName("prefetching_next")
 @Serializable
-data object PrefetchingNextRoute
+data object PrefetchingNextRoute : NavKey
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)

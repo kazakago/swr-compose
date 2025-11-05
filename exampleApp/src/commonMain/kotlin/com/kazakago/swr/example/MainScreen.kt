@@ -24,7 +24,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation3.runtime.NavKey
 import com.kazakago.swr.compose.LocalSWRCacheOwner
 import com.kazakago.swr.example.todolist.server.MockServer
 import com.kazakago.swr.example.todolist.server.MockServerAllFailed
@@ -34,11 +36,10 @@ import com.kazakago.swr.example.todolist.server.MockServerRandomFailed
 import com.kazakago.swr.example.todolist.server.MockServerSucceed
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @SerialName("main")
 @Serializable
-data object MainRoute
+data object MainRoute : NavKey
 
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
