@@ -7,6 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -68,7 +69,7 @@ fun App(
         }
     }
     val backStack = rememberNavBackStack(config, MainRoute)
-    val entryProvider = entryProvider {
+    val entryProvider: (NavKey) -> NavEntry<NavKey> = entryProvider {
         entry<MainRoute> {
             MainScreen(
                 mockServer = mockServer,
