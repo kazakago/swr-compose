@@ -18,7 +18,7 @@ androidPlugin = "8.13.0"
 androidCompileSdk = "36"
 androidMinSdk = "23"
 androidTargetSdk = "36"
-mavenPublish = "0.34.0"
+mavenPublish = "0.35.0"
 
 [libraries]
 kotlinPlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
