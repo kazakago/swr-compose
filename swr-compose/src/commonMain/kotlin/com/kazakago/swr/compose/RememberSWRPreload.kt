@@ -1,8 +1,8 @@
 package com.kazakago.swr.compose
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.retain.retain
 import com.kazakago.swr.runtime.SWRConfig
 import com.kazakago.swr.runtime.SWRPreload
 import com.kazakago.swr.store.persister.Persister
@@ -18,7 +18,7 @@ public fun <KEY : Any, DATA> rememberSWRPreload(
 ): SWRPreload<KEY, DATA> {
     val cacheOwner = LocalSWRCacheOwner.current
     val defaultConfig = LocalSWRConfig.current
-    return retain(key) {
+    return remember(key) {
         SWRPreload(
             key = key,
             fetcher = fetcher,

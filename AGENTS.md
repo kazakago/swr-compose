@@ -22,7 +22,7 @@ The project is structured as a multi-module Kotlin Multiplatform project:
 - **SWRConfig**: Global configuration (`swr-runtime/src/commonMain/kotlin/com/kazakago/swr/runtime/SWRConfig.kt`)
 - **RememberSWR**: Compose integration (`swr-compose/src/commonMain/kotlin/com/kazakago/swr/compose/RememberSWR.kt`)
 
-## Common Development Commands
+## Development Commands
 
 ### Build
 ```bash
@@ -32,6 +32,11 @@ The project is structured as a multi-module Kotlin Multiplatform project:
 ### Test
 ```bash
 ./gradlew swr-compose:jvmTest swr-runtime:jvmTest swr-store:jvmTest           # Run jvm tests (fast)
+```
+
+### Full test
+Need Xcode and Android SDK
+```bash
 ./gradlew swr-compose:allTests swr-runtime:allTests swr-store:allTests        # Run all tests (slow)
 ```
 
@@ -46,9 +51,9 @@ The project is structured as a multi-module Kotlin Multiplatform project:
 
 The library supports:
 - **Android**: Full Android support with Activity integration
-- **Desktop**: JVM desktop applications
+- **Desktop**: JVM desktop application
 - **iOS**: iOS applications via Kotlin/Native
-- **Web**: WASM-JS web applications
+- **Web**: Web applications
 
 ## Key Technologies
 

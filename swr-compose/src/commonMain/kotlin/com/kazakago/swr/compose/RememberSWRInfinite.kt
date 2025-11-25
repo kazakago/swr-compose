@@ -3,10 +3,11 @@ package com.kazakago.swr.compose
 import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.retain.retain
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.kazakago.swr.compose.internal.swrInfiniteSaver
 import com.kazakago.swr.compose.internal.toSWRInfiniteState
 import com.kazakago.swr.runtime.SWRConfig
 import com.kazakago.swr.runtime.SWRInfinite
@@ -30,7 +31,19 @@ public fun <KEY : Any, DATA> rememberSWRInfinite(
         val defaultConfig = LocalSWRConfig.current
         val lifecycleOwner = LocalLifecycleOwner.current
         val networkMonitor = networkMonitor ?: buildNetworkMonitor()
-        val swr = retain {
+        val swr = rememberSaveable(
+            saver = swrInfiniteSaver(
+                getKey = getKey,
+                fetcher = fetcher,
+                lifecycleOwner = lifecycleOwner,
+                scope = scope,
+                persister = persister,
+                cacheOwner = cacheOwner,
+                networkMonitor = networkMonitor,
+                defaultConfig = defaultConfig,
+                config = config,
+            )
+        ) {
             SWRInfinite(
                 getKey = getKey,
                 fetcher = fetcher,

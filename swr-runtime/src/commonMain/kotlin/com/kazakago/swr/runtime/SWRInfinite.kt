@@ -31,8 +31,8 @@ public class SWRInfinite<KEY : Any, DATA>(
 ) {
     private val initialConfig = SWRConfig<KEY, DATA>(defaultConfig).apply(config)
     private var swrList: List<SWRInternal<KEY, DATA>?> = emptyList()
-    private var pageSize: MutableStateFlow<Int> = MutableStateFlow(initialConfig.initialSize)
-    private var previousFirstKey: KEY? = null
+    public var pageSize: MutableStateFlow<Int> = MutableStateFlow(initialConfig.initialSize)
+    public var previousFirstKey: KEY? = null
 
     init {
         scope.launch {
