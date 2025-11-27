@@ -7,11 +7,15 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    alias(libs.plugins.androidApplication)
+    alias(libs.plugins.androidLibrary)
 }
 
 kotlin {
-    androidTarget {
+    android {
+        namespace = "com.kazakago.swr.example"
+        compileSdk = libs.versions.androidCompileSdk.get().toInt()
+        minSdk = libs.versions.androidMinSdk.get().toInt()
+        androidResources.enable = true
         compilerOptions {
             jvmTarget.set(JvmTarget.fromTarget(libs.versions.jvmToolchain.get()))
         }
@@ -51,34 +55,13 @@ kotlin {
             implementation(libs.androidxNavigation3Ui)
         }
         androidMain.dependencies {
+            implementation(libs.composeUiTooling)
             implementation(libs.androidxActivityCompose)
         }
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinxCoroutinesSwing)
         }
-    }
-}
-
-android {
-    namespace = "com.kazakago.swr.example"
-    compileSdk = libs.versions.androidCompileSdk.get().toInt()
-    defaultConfig {
-        applicationId = "com.kazakago.swr.example"
-        minSdk = libs.versions.androidMinSdk.get().toInt()
-        targetSdk = libs.versions.androidTargetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
-    }
-    buildTypes {
-        release {
-            isMinifyEnabled = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-        }
-    }
-    compileOptions {
-        sourceCompatibility(libs.versions.jvmToolchain.get())
-        targetCompatibility(libs.versions.jvmToolchain.get())
     }
 }
 
@@ -91,8 +74,4 @@ compose.desktop {
             packageVersion = "1.0.0"
         }
     }
-}
-
-dependencies {
-    debugImplementation(libs.composeUiTooling)
 }
