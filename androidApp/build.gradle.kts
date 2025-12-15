@@ -3,10 +3,10 @@ plugins {
 }
 
 android {
-    namespace = "com.kazakago.swr.example.androidapp"
+    namespace = "com.kazakago.swr.example"
     compileSdk = libs.versions.androidCompileSdk.get().toInt()
     defaultConfig {
-        applicationId = "com.kazakago.swr.example.androidapp"
+        applicationId = "com.kazakago.swr.example"
         minSdk = libs.versions.androidMinSdk.get().toInt()
         targetSdk = libs.versions.androidTargetSdk.get().toInt()
         versionCode = 1
