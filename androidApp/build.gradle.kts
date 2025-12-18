@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.kazakago.swr.example"
+    namespace = "com.kazakago.swr.example.app"
     compileSdk = libs.versions.androidCompileSdk.get().toInt()
     defaultConfig {
         applicationId = "com.kazakago.swr.example"

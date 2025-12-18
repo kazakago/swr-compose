@@ -73,7 +73,6 @@ internal class DataSelector<DATA>(
             }.onSuccess { data ->
                 putDataToLocal(data)
                 putState(DataState.Fixed())
-                data
             }.onFailure { error ->
                 putState(DataState.Error(error))
             }

@@ -63,7 +63,7 @@ public data class SWRInfiniteMutate<DATA>(
                     }.awaitAll()
                 }
             }
-        }.onFailure { throwable ->
+        }.onFailure {
             if (currentConfig.rollbackOnError) {
                 coroutineScope {
                     buildList {

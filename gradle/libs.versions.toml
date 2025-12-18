@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.2.21" # https://kotlinlang.org/docs/multiplatform-compatibility-guide.html#version-compatibility
+kotlin = "2.3.0" # https://kotlinlang.org/docs/multiplatform-compatibility-guide.html#version-compatibility
 kotlinxCoroutines = "1.10.2"
 kotlinxSerialization = "1.9.0"
 kotlinxBrowser = "0.5.0"
@@ -10,10 +10,10 @@ jetbrainsNavigation3 = "1.0.0-alpha06"
 jetbrainsLifecycle = "2.10.0-alpha06"
 androidxLifecycle = "2.10.0"
 androidxStartup = "1.2.0"
-androidxActivity = "1.12.1"
+androidxActivity = "1.12.2"
 turbine = "1.2.1"
 dokka = "2.1.0"
-jvmToolchain = "11"
+jvmToolchain = "17"
 androidPlugin = "9.0.0-beta05"
 androidCompileSdk = "36"
 androidMinSdk = "23"
@@ -32,7 +32,7 @@ kotlinxDatetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.r
 dokkaPlugin = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
 composeUi = { module = "org.jetbrains.compose.ui:ui", version.ref = "composeMultiplatform" }
 composeUiTooling = { module = "org.jetbrains.compose.ui:ui-tooling", version.ref = "composeMultiplatform" }
-composePreview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "composeMultiplatform" }
+composeUiToolingPreview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "composeMultiplatform" }
 composeResources = { module = "org.jetbrains.compose.components:components-resources", version.ref = "composeMultiplatform" }
 composeMaterial3 = { module = "org.jetbrains.compose.material3:material3", version.ref = "composeMaterial3" }
 androidxNavigation3Ui = { module = "org.jetbrains.androidx.navigation3:navigation3-ui", version.ref = "jetbrainsNavigation3" }

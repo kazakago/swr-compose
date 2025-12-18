@@ -48,7 +48,7 @@ kotlin {
         commonMain.dependencies {
             implementation(projects.swrCompose)
             implementation(libs.composeMaterial3)
-            implementation(libs.composePreview)
+            implementation(libs.composeUiToolingPreview)
             implementation(libs.composeResources)
             implementation(libs.kotlinxDatetime)
             implementation(libs.kotlinxSerializationCore)

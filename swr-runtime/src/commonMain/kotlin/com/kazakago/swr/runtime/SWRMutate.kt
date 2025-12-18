@@ -27,7 +27,7 @@ public data class SWRMutate<DATA>(
             if (currentConfig.revalidate) {
                 validate()
             }
-        }.onFailure { throwable ->
+        }.onFailure {
             if (currentConfig.rollbackOnError) {
                 update(previousData, true)
             }
