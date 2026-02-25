@@ -15,6 +15,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - uses: gradle/actions/setup-gradle@v4
+
       - run: ./gradlew exampleApp:wasmJsBrowserDistribution
 
       - uses: actions/upload-pages-artifact@v4

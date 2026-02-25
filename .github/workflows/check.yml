@@ -7,10 +7,56 @@ on:
   workflow_dispatch:
 
 jobs:
-  check:
+  test-jvm:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v6
 
-      - run: ./gradlew check
+      - uses: gradle/actions/setup-gradle@v4
+
+      - run: ./gradlew swr-store:jvmTest swr-runtime:jvmTest swr-compose:jvmTest
+
+  test-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - run: ./gradlew swr-store:testAndroidHostTest swr-runtime:testAndroidHostTest swr-compose:testAndroidHostTest
+
+  test-ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - run: ./gradlew swr-store:iosSimulatorArm64Test swr-runtime:iosSimulatorArm64Test swr-compose:iosSimulatorArm64Test
+
+  test-wasmJs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - run: ./gradlew swr-store:wasmJsBrowserTest swr-runtime:wasmJsBrowserTest swr-compose:wasmJsBrowserTest
+
+  test-js:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - run: ./gradlew swr-store:jsBrowserTest swr-runtime:jsBrowserTest swr-compose:jsBrowserTest
+
+  build-example:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - run: ./gradlew exampleApp:compileKotlinJvm
