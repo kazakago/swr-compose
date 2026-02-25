@@ -20,7 +20,7 @@ public sealed class SWRState<DATA> {
     public abstract val data: DATA?
     public abstract val error: Throwable?
     public abstract val isValidating: Boolean
-    public val isLoading: Boolean get() = isValidating && data == null
+    public val isLoading: Boolean = isValidating && data == null
     public abstract val mutate: SWRMutate<DATA>
 
     public operator fun component1(): DATA? = data

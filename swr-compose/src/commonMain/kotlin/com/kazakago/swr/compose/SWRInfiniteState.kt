@@ -23,7 +23,7 @@ public sealed class SWRInfiniteState<DATA> {
     public abstract val data: List<DATA?>?
     public abstract val error: Throwable?
     public abstract val isValidating: Boolean
-    public val isLoading: Boolean get() = isValidating && data == null
+    public val isLoading: Boolean = isValidating && data == null
     public abstract val mutate: SWRInfiniteMutate<DATA>
     public abstract val size: Int
     public abstract val setSize: (size: Int) -> Unit
