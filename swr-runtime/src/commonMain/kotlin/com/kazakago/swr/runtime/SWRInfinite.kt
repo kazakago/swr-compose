@@ -77,10 +77,10 @@ public class SWRInfinite<KEY : Any, DATA>(
                         transform = { stateList ->
                             val data = stateList.map { it.data }
                             val error = stateList.firstNotNullOfOrNull { it.error }
-                            val isLoading = stateList.any { it.isLoading }
+                            val isValidating = stateList.any { it.isValidating }
                             if (error != null) {
                                 SWRStoreState.Error(data, error)
-                            } else if (isLoading) {
+                            } else if (isValidating) {
                                 if (stateList.any { it.data != null }) {
                                     SWRStoreState.Loading(data)
                                 } else {

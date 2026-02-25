@@ -55,7 +55,7 @@ fun InfinitePaginationScreen(
     onBack: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
-    val (data, error, isLoading, mutate, size, setSize) = rememberSWRInfinite(getKey, fetcher) {
+    val (data, error, isValidating, isLoading, mutate, size, setSize) = rememberSWRInfinite(getKey, fetcher) {
         initialSize = 2              // default is 1
 //        revalidateAll = false      // default is false
 //        revalidateFirstPage = true // default is true

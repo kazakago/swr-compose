@@ -46,7 +46,7 @@ data object AutoRevalidationRoute : NavKey
 fun AutoRevalidationScreen(
     onBack: () -> Unit,
 ) {
-    val (data, _, isLoading) = rememberSWR(key = "/auto_revalidation", fetcher = fetcher) {
+    val (data, _, isValidating, isLoading) = rememberSWR(key = "/auto_revalidation", fetcher = fetcher) {
         revalidateOnMount = true     // default is null
         revalidateOnFocus = true     // default is true
         revalidateOnReconnect = true // default is true
@@ -75,7 +75,7 @@ fun AutoRevalidationScreen(
             if (data == null) {
                 LoadingContent()
             } else {
-                if (isLoading) {
+                if (isValidating) {
                     LinearProgressIndicator(Modifier.fillMaxWidth())
                 }
                 Box(
