@@ -13,7 +13,7 @@ public val OnErrorRetryDefault: suspend (
 ) -> Unit = { _, _, config, revalidate, options ->
     if (!options.dedupe && config.errorRetryCount.let { it == null || options.retryCount <= it }) {
         val exponentialBackoff = floor((Random.nextDouble() + 0.5) * 1.shl(options.retryCount)).toLong() * config.errorRetryInterval.inWholeMilliseconds
-        delay(exponentialBackoff)
+        delay(minOf(exponentialBackoff, 30_000))
         revalidate(options)
     }
 }
