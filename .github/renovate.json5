@@ -8,4 +8,5 @@
     },
   ],
   "platformAutomerge": true,
+  "ignoreDeps": ["buildlogic.publish:buildlogic.publish.gradle.plugin"],
 }
