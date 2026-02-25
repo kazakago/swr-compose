@@ -1,0 +1,106 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_bump:
+        description: "Select version bump type"
+        required: true
+        type: choice
+        options:
+          - major
+          - minor
+          - patch
+        default: "patch"
+
+permissions:
+  contents: write
+
+jobs:
+  bump-version:
+    name: Bump version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+
+      - name: Bump version
+        id: version
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = 'build-logic/src/main/kotlin/buildlogic.publish.gradle.kts';
+            const content = fs.readFileSync(path, 'utf8');
+
+            const match = content.match(/version = "(\d+)\.(\d+)\.(\d+)"/);
+            if (!match) throw new Error('Version not found in ' + path);
+
+            let [, major, minor, patch] = match.map(Number);
+            switch ('${{ inputs.version_bump }}') {
+              case 'major': major++; minor = 0; patch = 0; break;
+              case 'minor': minor++; patch = 0; break;
+              case 'patch': patch++; break;
+            }
+
+            const newVersion = `${major}.${minor}.${patch}`;
+            fs.writeFileSync(path, content.replace(match[0], `version = "${newVersion}"`));
+            core.setOutput('version', `v${newVersion}`);
+            core.info(`Bumped version to: v${newVersion}`);
+
+      - name: Commit and tag
+        run: |
+          git add build-logic/src/main/kotlin/buildlogic.publish.gradle.kts
+          git commit -m "${{ steps.version.outputs.version }}"
+          git tag "${{ steps.version.outputs.version }}"
+
+      - name: Push commit and tag
+        run: |
+          git push origin HEAD
+          git push origin "${{ steps.version.outputs.version }}"
+
+  deploy:
+    name: Deploy
+    needs: bump-version
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.bump-version.outputs.version }}
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Publish to Maven Central
+        run: ./gradlew publishAndReleaseToMavenCentral
+        env:
+          ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
+          ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
+          ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.SIGNING_KEY }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.SIGNING_KEY_ID }}
+          ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.SIGNING_KEY_PASSWORD }}
+
+  create-release:
+    name: Create release
+    needs:
+      - bump-version
+      - deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.bump-version.outputs.version }}
+          generate_release_notes: true
