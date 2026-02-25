@@ -60,7 +60,7 @@ fun ToDoListScreen(
     val openToDoCreationDialog = remember { mutableStateOf(false) }
     val openToDoEditingDialog = remember { mutableStateOf<Pair<Int, String>?>(null) }
 
-    val (todoList, error, isValidating, mutate) = rememberSWR(
+    val (todoList, error, isValidating, isLoading, mutate) = rememberSWR(
         key = "/get_todos/$mockServer",
         fetcher = { mockServer.getToDoList() },
     ) {

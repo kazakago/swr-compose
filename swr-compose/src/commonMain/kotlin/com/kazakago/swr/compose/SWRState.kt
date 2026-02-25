@@ -26,7 +26,8 @@ public sealed class SWRState<DATA> {
     public operator fun component1(): DATA? = data
     public operator fun component2(): Throwable? = error
     public operator fun component3(): Boolean = isValidating
-    public operator fun component4(): SWRMutate<DATA> = mutate
+    public operator fun component4(): Boolean = isLoading
+    public operator fun component5(): SWRMutate<DATA> = mutate
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
