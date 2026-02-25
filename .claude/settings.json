@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh *)",
+      "Bash(adb *)",
+      "Bash(./gradlew *)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:api.github.com)",
+      "WebFetch(domain:kotlinlang.org)",
+      "WebFetch(domain:developer.android.com)",
+      "WebFetch(domain:swr.vercel.app)",
+      "WebSearch",
+      "Write",
+      "Edit",
+      "Skill"
+    ]
+  },
+  "plansDirectory": ".claude/plans"
+}
