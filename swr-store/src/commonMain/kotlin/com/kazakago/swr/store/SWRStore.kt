@@ -5,6 +5,7 @@ import com.kazakago.swr.store.cache.defaultSWRCacheOwner
 import com.kazakago.swr.store.internal.DataSelector
 import com.kazakago.swr.store.persister.Persister
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
 
 public class SWRStore<KEY : Any, DATA>(
     public val key: KEY,
@@ -35,6 +36,12 @@ public class SWRStore<KEY : Any, DATA>(
             cacheOwner.getOrPut(key).stateMapFlow.value = state
         },
     )
+
+    public val revalidationSignal: SharedFlow<Unit> = cacheOwner.getOrPut(key).revalidationSignal
+
+    public suspend fun requestRevalidation() {
+        cacheOwner.getOrPut(key).requestRevalidation()
+    }
 
     public val flow: Flow<SWRStoreState<DATA>> = dataSelector.flow
 

@@ -60,6 +60,11 @@ internal class SWRInternal<KEY : Any, DATA>(
                 }
             }
         }
+        scope.launch {
+            store.revalidationSignal.collect {
+                validate()
+            }
+        }
         if (config.refreshInterval > Duration.ZERO) {
             scope.launch {
                 val validateInterval = suspend {
