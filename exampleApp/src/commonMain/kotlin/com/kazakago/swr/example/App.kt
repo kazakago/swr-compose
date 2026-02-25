@@ -29,6 +29,8 @@ import com.kazakago.swr.example.basic.InfinitePaginationRoute
 import com.kazakago.swr.example.basic.InfinitePaginationScreen
 import com.kazakago.swr.example.basic.MutationRoute
 import com.kazakago.swr.example.basic.MutationScreen
+import com.kazakago.swr.example.basic.SWRMutationRoute
+import com.kazakago.swr.example.basic.SWRMutationScreen
 import com.kazakago.swr.example.basic.PaginationRoute
 import com.kazakago.swr.example.basic.PaginationScreen
 import com.kazakago.swr.example.basic.PrefetchingNextRoute
@@ -61,6 +63,7 @@ fun App(
                 subclass(ConditionalFetchingRoute::class, ConditionalFetchingRoute.serializer())
                 subclass(ArgumentsRoute::class, ArgumentsRoute.serializer())
                 subclass(MutationRoute::class, MutationRoute.serializer())
+                subclass(SWRMutationRoute::class, SWRMutationRoute.serializer())
                 subclass(PaginationRoute::class, PaginationRoute.serializer())
                 subclass(InfinitePaginationRoute::class, InfinitePaginationRoute.serializer())
                 subclass(PrefetchingRoute::class, PrefetchingRoute.serializer())
@@ -81,6 +84,7 @@ fun App(
                 moveToConditionalFetching = { backStack.add(ConditionalFetchingRoute) },
                 moveToArguments = { backStack.add(ArgumentsRoute) },
                 moveToMutation = { backStack.add(MutationRoute) },
+                moveToSWRMutation = { backStack.add(SWRMutationRoute) },
                 moveToPagination = { backStack.add(PaginationRoute) },
                 moveToInfinitePagination = { backStack.add(InfinitePaginationRoute) },
                 moveToPrefetching = { backStack.add(PrefetchingRoute) },
@@ -119,6 +123,11 @@ fun App(
         }
         entry<MutationRoute> {
             MutationScreen(
+                onBack = backStack::removeLastOrNull,
+            )
+        }
+        entry<SWRMutationRoute> {
+            SWRMutationScreen(
                 onBack = backStack::removeLastOrNull,
             )
         }

@@ -52,7 +52,7 @@ fun MutationScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Mutation") },
+                title = { Text("Mutate") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(painterResource(Res.drawable.arrow_back_24dp), contentDescription = null)
