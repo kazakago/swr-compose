@@ -53,6 +53,7 @@ fun MainScreen(
     moveToConditionalFetching: () -> Unit,
     moveToArguments: () -> Unit,
     moveToMutation: () -> Unit,
+    moveToSWRMutation: () -> Unit,
     moveToPagination: () -> Unit,
     moveToInfinitePagination: () -> Unit,
     moveToPrefetching: () -> Unit,
@@ -120,11 +121,17 @@ fun MainScreen(
                             }
                             moveToArguments()
                         }
-                        ExampleButton("Mutation") {
+                        ExampleButton("Mutate") {
                             if (isClearCache.value) {
                                 swrCacheOwner.clearAll()
                             }
                             moveToMutation()
+                        }
+                        ExampleButton("Remote Mutation") {
+                            if (isClearCache.value) {
+                                swrCacheOwner.clearAll()
+                            }
+                            moveToSWRMutation()
                         }
                         ExampleButton("Pagination") {
                             if (isClearCache.value) {
@@ -221,6 +228,7 @@ fun MainScreenPreview() {
             moveToConditionalFetching = {},
             moveToArguments = {},
             moveToMutation = {},
+            moveToSWRMutation = {},
             moveToPagination = {},
             moveToInfinitePagination = {},
             moveToPrefetching = {},

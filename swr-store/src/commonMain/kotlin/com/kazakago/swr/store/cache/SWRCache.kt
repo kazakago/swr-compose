@@ -1,7 +1,10 @@
 package com.kazakago.swr.store.cache
 
 import com.kazakago.swr.store.internal.DataState
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 
 public val defaultSWRCacheOwner: SWRCacheOwner = SWRCacheOwner()
 
@@ -20,6 +23,12 @@ public class SWRCacheOwner {
 public class SWRCache {
     public var data: Any? = null
     internal val stateMapFlow: MutableStateFlow<DataState> = MutableStateFlow(DataState.initialize())
+    private val _revalidationSignal: MutableSharedFlow<Unit> = MutableSharedFlow()
+    public val revalidationSignal: SharedFlow<Unit> = _revalidationSignal.asSharedFlow()
+
+    public suspend fun requestRevalidation() {
+        _revalidationSignal.emit(Unit)
+    }
 
     public fun clear() {
         data = null

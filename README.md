@@ -60,48 +60,147 @@ fun Profile() {
 
 Live demo of Kotlin/Wasm is [**here**](https://kazakago.github.io/swr-compose/).
 
-Refer to the [**example module**](exampleApp) for details. This module works as an Compose Multiplatform app.
+Refer to the [**example module**](exampleApp) for details. This module works as a Compose Multiplatform app.
 
 ## Supported Features
 
-| Feature name                                                                  | Note                           |
-|-------------------------------------------------------------------------------|--------------------------------|
-| [Global Configuration](https://swr.vercel.app/docs/global-configuration)      |                                |
-| [Data Fetching](https://swr.vercel.app/docs/data-fetching)                    |                                |
-| [Error Handling](https://swr.vercel.app/docs/error-handling)                  |                                |
-| [Auto Revalidation](https://swr.vercel.app/docs/revalidation)                 |                                |
-| [Conditional Data Fetching](https://swr.vercel.app/docs/conditional-fetching) |                                |
-| [Arguments](https://swr.vercel.app/docs/arguments)                            |                                |
-| [Mutation](https://swr.vercel.app/docs/mutation)                              |                                |
-| [Pagination](https://swr.vercel.app/docs/pagination)                          |                                |
-| [Prefetching Data](https://swr.vercel.app/docs/prefetching)                   | Available by `useSWRPreload()` |
+| Feature name                                                                  | Note                                    |
+|-------------------------------------------------------------------------------|-----------------------------------------|
+| [Global Configuration](https://swr.vercel.app/docs/global-configuration)      |                                         |
+| [Data Fetching](https://swr.vercel.app/docs/data-fetching)                    |                                         |
+| [Error Handling](https://swr.vercel.app/docs/error-handling)                  |                                         |
+| [Auto Revalidation](https://swr.vercel.app/docs/revalidation)                 |                                         |
+| [Conditional Data Fetching](https://swr.vercel.app/docs/conditional-fetching) |                                         |
+| [Arguments](https://swr.vercel.app/docs/arguments)                            |                                         |
+| [Mutation](https://swr.vercel.app/docs/mutation)                              | Available by `rememberSWRMutation()`    |
+| [Pagination](https://swr.vercel.app/docs/pagination)                          | Available by `rememberSWRInfinite()`    |
+| [Prefetching Data](https://swr.vercel.app/docs/prefetching)                   | Available by `rememberSWRPreload()`     |
 
 ## Supported Options
 
 The following options are supported for React SWR.  
 https://swr.vercel.app/docs/options
 
-| Option name                                               | Default value                                                                      |
-|-----------------------------------------------------------|------------------------------------------------------------------------------------|
-| revalidateIfStale                                         | true                                                                               |
-| revalidateOnMount                                         | true                                                                               |
-| revalidateOnFocus                                         | true                                                                               |
-| revalidateOnReconnect                                     | true                                                                               |
-| refreshInterval                                           | 0.seconds (disable)                                                                |
-| refreshWhenHidden                                         | false                                                                              |
-| refreshWhenOffline                                        | false                                                                              |
-| shouldRetryOnError                                        | true                                                                               |
-| dedupingInterval                                          | 2.seconds                                                                          |
-| focusThrottleInterval                                     | 5.seconds                                                                          |
-| loadingTimeout                                            | 3.seconds                                                                          |
-| errorRetryInterval                                        | 5.seconds                                                                          |
-| errorRetryCount                                           |                                                                                    |
-| fallback                                                  |                                                                                    |
-| keepPreviousData                                          | false                                                                              |
-| onLoadingSlow(key, config)                                |                                                                                    |
-| onSuccess(data, key, config)                              |                                                                                    |
-| onError(err, key, config)                                 |                                                                                    |
-| onErrorRetry(err, key, config, revalidate, revalidateOps) | [Exponential backoff](https://en.wikipedia.org/wiki/Exponential_backoff) algorithm |
+| Option name           | Default value                                                              | Description                                        |
+|-----------------------|----------------------------------------------------------------------------|----------------------------------------------------|
+| revalidateIfStale     | true                                                                       | Revalidate when cached data is stale               |
+| revalidateOnMount     | true                                                                       | Revalidate when component mounts                   |
+| revalidateOnFocus     | true                                                                       | Revalidate when app regains focus                  |
+| revalidateOnReconnect | true                                                                       | Revalidate when network reconnects                 |
+| refreshInterval       | 0.seconds                                                                  | Polling interval for periodic refresh (0=disabled) |
+| refreshWhenHidden     | false                                                                      | Continue polling when app is in background          |
+| refreshWhenOffline    | false                                                                      | Continue polling when offline                       |
+| shouldRetryOnError    | true                                                                       | Retry fetching on error                            |
+| dedupingInterval      | 2.seconds                                                                  | Time window to deduplicate identical requests      |
+| focusThrottleInterval | 5.seconds                                                                  | Min interval between focus-triggered revalidations |
+| loadingTimeout        | 3.seconds                                                                  | Timeout before `onLoadingSlow` callback fires      |
+| errorRetryInterval    | 5.seconds                                                                  | Wait time between error retries                    |
+| errorRetryCount       |                                                                            | Maximum number of error retries                    |
+| fallbackData          |                                                                            | Data to display while loading                      |
+| onLoadingSlow         |                                                                            | Callback when loading exceeds `loadingTimeout`     |
+| onSuccess             |                                                                            | Callback on successful data fetch                  |
+| onError               |                                                                            | Callback on fetch error                            |
+| onErrorRetry          | [Exponential backoff](https://en.wikipedia.org/wiki/Exponential_backoff)   | Custom error retry handler                         |
+
+## Mutation
+
+`rememberSWRMutation()` provides a way to mutate remote data. Unlike `rememberSWR()`, it does not automatically fetch data — mutations are triggered manually.
+
+```kotlin
+private val fetcher: suspend (key: String, arg: String) -> String = { key, arg ->
+    updateNameApi.execute(key, arg)
+}
+
+@Composable
+fun UpdateProfile() {
+    val (trigger, isMutating) = rememberSWRMutation("/api/user", fetcher)
+
+    Button(
+        onClick = { scope.launch { trigger("new name") } },
+        enabled = !isMutating,
+    ) {
+        Text(if (isMutating) "Updating..." else "Update")
+    }
+}
+```
+
+### Mutation Options
+
+| Option name     | Default value | Description                                          |
+|-----------------|---------------|------------------------------------------------------|
+| optimisticData  |               | Data to display immediately before mutation resolves |
+| revalidate      | false         | Revalidate cached data after mutation                |
+| populateCache   | false         | Update cache with mutation result                    |
+| rollbackOnError | true          | Revert to previous data if mutation fails            |
+| onSuccess       |               | Callback on successful mutation                      |
+| onError         |               | Callback on mutation error                           |
+
+## Pagination / Infinite Loading
+
+`rememberSWRInfinite()` provides paginated data fetching with dynamic page management.
+
+```kotlin
+@Composable
+fun UserList() {
+    val (data, error, isLoading, _, size, setSize) = rememberSWRInfinite(
+        getKey = { pageIndex, previousPageData ->
+            if (previousPageData != null && previousPageData.isEmpty()) null // reached the end
+            else "/api/users?page=$pageIndex"
+        },
+        fetcher = { key -> fetchUsers(key) },
+    )
+
+    // data is List<List<User>?> — one entry per page
+    data?.flatten()?.forEach { user ->
+        Text(user.name)
+    }
+
+    Button(onClick = { setSize(size + 1) }) {
+        Text("Load More")
+    }
+}
+```
+
+Pagination-specific options can be set in the config block:
+
+| Option name         | Default value | Description                              |
+|---------------------|---------------|------------------------------------------|
+| initialSize         | 1             | Number of pages to load initially        |
+| revalidateAll       | false         | Revalidate all loaded pages              |
+| revalidateFirstPage | true          | Revalidate the first page on changes     |
+| persistSize         | false         | Persist the page count across re-mounts  |
+
+## Immutable Data
+
+`rememberSWRImmutable()` fetches data once and never revalidates automatically. Useful for data that doesn't change (e.g., static resources, user settings loaded once).
+
+```kotlin
+@Composable
+fun StaticContent() {
+    val (data, error) = rememberSWRImmutable("/api/config", fetcher)
+    // ...
+}
+```
+
+This is equivalent to `rememberSWR()` with all revalidation options disabled.
+
+## Persistent Cache
+
+You can provide a `Persister` to save fetched data to local storage (e.g., database, file system). This allows data to survive app restarts.
+
+```kotlin
+val persister = Persister<String, User>(
+    loadData = { key -> database.getUser(key) },
+    saveData = { key, data -> database.saveUser(key, data) },
+)
+
+@Composable
+fun Profile() {
+    val (data, error) = rememberSWR("/api/user", fetcher, persister)
+    // On first load, persister.loadData is called for immediate display,
+    // then fetcher runs in background to revalidate.
+}
+```
 
 ## Notice for performance
 
