@@ -6,6 +6,7 @@
       "Bash(adb *)",
       "Bash(./gradlew *)",
       "WebFetch(domain:github.com)",
+      "WebFetch(domain:githubusercontent.com)",
       "WebFetch(domain:kotlinlang.org)",
       "WebFetch(domain:jetbrains.com)",
       "WebFetch(domain:android.com)",
