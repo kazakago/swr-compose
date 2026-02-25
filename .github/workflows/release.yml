@@ -80,7 +80,7 @@ jobs:
         with:
           ref: ${{ needs.bump-version.outputs.version }}
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v5
 
       - name: Publish to Maven Central
         run: ./gradlew publishAndReleaseToMavenCentral

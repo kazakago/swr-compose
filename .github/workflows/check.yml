@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v5
 
       - run: ./gradlew swr-store:jvmTest swr-runtime:jvmTest swr-compose:jvmTest
 
@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v5
 
       - run: ./gradlew swr-store:testAndroidHostTest swr-runtime:testAndroidHostTest swr-compose:testAndroidHostTest
 
@@ -30,7 +30,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v5
 
       - run: ./gradlew swr-store:iosSimulatorArm64Test swr-runtime:iosSimulatorArm64Test swr-compose:iosSimulatorArm64Test
 
@@ -39,7 +39,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v5
 
       - run: ./gradlew swr-store:wasmJsBrowserTest swr-runtime:wasmJsBrowserTest swr-compose:wasmJsBrowserTest
 
@@ -48,7 +48,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v5
 
       - run: ./gradlew swr-store:jsBrowserTest swr-runtime:jsBrowserTest swr-compose:jsBrowserTest
 
@@ -57,6 +57,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v5
 
       - run: ./gradlew exampleApp:compileKotlinJvm
