@@ -60,7 +60,7 @@ fun ToDoListScreen(
     val openToDoCreationDialog = remember { mutableStateOf(false) }
     val openToDoEditingDialog = remember { mutableStateOf<Pair<Int, String>?>(null) }
 
-    val (todoList, error, isLoading, mutate) = rememberSWR(
+    val (todoList, error, isValidating, mutate) = rememberSWR(
         key = "/get_todos/$mockServer",
         fetcher = { mockServer.getToDoList() },
     ) {
@@ -101,13 +101,13 @@ fun ToDoListScreen(
                 .padding(paddingValue),
         ) {
             if (todoList == null) {
-                if (isLoading) {
+                if (isValidating) {
                     LoadingContent()
                 } else if (error != null) {
                     ErrorContent { scope.launch { mutate() } }
                 }
             } else {
-                if (isLoading || isMuting.value) {
+                if (isValidating || isMuting.value) {
                     LinearProgressIndicator(Modifier.fillMaxWidth())
                 }
                 LazyColumn(

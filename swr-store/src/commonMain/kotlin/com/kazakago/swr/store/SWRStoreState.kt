@@ -8,30 +8,30 @@ public sealed interface SWRStoreState<out T> {
 
     public val data: T?
     public val error: Throwable?
-    public val isLoading: Boolean
+    public val isValidating: Boolean
 
     public operator fun component1(): T? = data
     public operator fun component2(): Throwable? = error
-    public operator fun component3(): Boolean = isLoading
+    public operator fun component3(): Boolean = isValidating
 
     public data class Loading<out T>(
         override val data: T?,
     ) : SWRStoreState<T> {
         override val error: Throwable? = null
-        override val isLoading: Boolean = true
+        override val isValidating: Boolean = true
     }
 
     public data class Completed<out T>(
         override val data: T,
     ) : SWRStoreState<T> {
         override val error: Throwable? = null
-        override val isLoading: Boolean = false
+        override val isValidating: Boolean = false
     }
 
     public data class Error<out T>(
         override val data: T?,
         override val error: Throwable,
     ) : SWRStoreState<T> {
-        override val isLoading: Boolean = false
+        override val isValidating: Boolean = false
     }
 }

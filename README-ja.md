@@ -143,7 +143,7 @@ fun UpdateProfile() {
 ```kotlin
 @Composable
 fun UserList() {
-    val (data, error, isLoading, _, size, setSize) = rememberSWRInfinite(
+    val (data, error, isValidating, _, size, setSize) = rememberSWRInfinite(
         getKey = { pageIndex, previousPageData ->
             if (previousPageData != null && previousPageData.isEmpty()) null // 末尾に到達
             else "/api/users?page=$pageIndex"

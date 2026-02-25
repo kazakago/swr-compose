@@ -19,12 +19,12 @@ public sealed class SWRState<DATA> {
 
     public abstract val data: DATA?
     public abstract val error: Throwable?
-    public abstract val isLoading: Boolean
+    public abstract val isValidating: Boolean
     public abstract val mutate: SWRMutate<DATA>
 
     public operator fun component1(): DATA? = data
     public operator fun component2(): Throwable? = error
-    public operator fun component3(): Boolean = isLoading
+    public operator fun component3(): Boolean = isValidating
     public operator fun component4(): SWRMutate<DATA> = mutate
 
     override fun equals(other: Any?): Boolean {
@@ -34,7 +34,7 @@ public sealed class SWRState<DATA> {
 
         if (data != other.data) return false
         if (error != other.error) return false
-        if (isLoading != other.isLoading) return false
+        if (isValidating != other.isValidating) return false
         if (mutate != other.mutate) return false
 
         return true
@@ -44,7 +44,7 @@ public sealed class SWRState<DATA> {
         var result = this::class.hashCode()
         result = 31 * result + (data?.hashCode() ?: 0)
         result = 31 * result + (error?.hashCode() ?: 0)
-        result = 31 * result + isLoading.hashCode()
+        result = 31 * result + isValidating.hashCode()
         result = 31 * result + mutate.hashCode()
         return result
     }
@@ -54,7 +54,7 @@ public sealed class SWRState<DATA> {
         override val mutate: SWRMutate<DATA>,
     ) : SWRState<DATA>() {
         override val error: Throwable? = null
-        override val isLoading: Boolean = true
+        override val isValidating: Boolean = true
     }
 
     public class Completed<DATA>(
@@ -62,7 +62,7 @@ public sealed class SWRState<DATA> {
         override val mutate: SWRMutate<DATA>,
     ) : SWRState<DATA>() {
         override val error: Throwable? = null
-        override val isLoading: Boolean = false
+        override val isValidating: Boolean = false
     }
 
     public class Error<DATA>(
@@ -70,6 +70,6 @@ public sealed class SWRState<DATA> {
         override val error: Throwable,
         override val mutate: SWRMutate<DATA>,
     ) : SWRState<DATA>() {
-        override val isLoading: Boolean = false
+        override val isValidating: Boolean = false
     }
 }
