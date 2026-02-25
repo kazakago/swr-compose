@@ -45,7 +45,7 @@ fun ErrorHandlingScreen(
 ) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-    val (data, error, _, mutate) = rememberSWR(key = "/error_handling", fetcher = fetcher) {
+    val (data, error, _, _, mutate) = rememberSWR(key = "/error_handling", fetcher = fetcher) {
         shouldRetryOnError = true           // default is true
         errorRetryCount = 3                 // default is null
         errorRetryInterval = 5.seconds      // default is 5.seconds

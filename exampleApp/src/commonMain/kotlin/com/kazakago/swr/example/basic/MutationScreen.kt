@@ -48,7 +48,7 @@ fun MutationScreen(
     onBack: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
-    val (data, _, _, mutate) = rememberSWR(key = "/mutation", fetcher = fetcher)
+    val (data, _, _, _, mutate) = rememberSWR(key = "/mutation", fetcher = fetcher)
     Scaffold(
         topBar = {
             TopAppBar(
