@@ -129,6 +129,74 @@ class KeepPreviousDataOptionTest {
     }
 
     @Test
+    fun withKeepPreviousDataRapidKeyChanges() = runTest {
+        val holder = KeepPreviousDataHolder<String>()
+        val cacheOwner = SWRCacheOwner()
+
+        // Initial SWR completes
+        val swr1 = SWR(
+            key = "key1",
+            fetcher = {
+                delay(100)
+                "data1"
+            },
+            lifecycleOwner = TestLifecycleOwner(),
+            scope = backgroundScope,
+            cacheOwner = cacheOwner,
+            networkMonitor = TestNetworkMonitor(),
+        ) {
+            keepPreviousData = true
+        }
+        swr1.stateFlow.withKeepPreviousData(holder).test {
+            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
+            advanceTimeBy(101)
+            assertEquals(SWRStoreState.Completed("data1"), expectMostRecentItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        // Rapid key change: key2 starts loading but we switch to key3 before it completes
+        val swr2 = SWR(
+            key = "key2",
+            fetcher = {
+                delay(200)
+                "data2"
+            },
+            lifecycleOwner = TestLifecycleOwner(),
+            scope = backgroundScope,
+            cacheOwner = cacheOwner,
+            networkMonitor = TestNetworkMonitor(),
+        ) {
+            keepPreviousData = true
+        }
+        swr2.stateFlow.withKeepPreviousData(holder).test {
+            // Should show previous data1 during loading
+            assertEquals(SWRStoreState.Loading("data1"), expectMostRecentItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        // Switch to key3 while key2 is still loading — holder should still have data1
+        val swr3 = SWR(
+            key = "key3",
+            fetcher = {
+                delay(100)
+                "data3"
+            },
+            lifecycleOwner = TestLifecycleOwner(),
+            scope = backgroundScope,
+            cacheOwner = cacheOwner,
+            networkMonitor = TestNetworkMonitor(),
+        ) {
+            keepPreviousData = true
+        }
+        swr3.stateFlow.withKeepPreviousData(holder).test {
+            // Still shows data1 since key2 never completed
+            assertEquals(SWRStoreState.Loading("data1"), expectMostRecentItem())
+            advanceTimeBy(101)
+            assertEquals(SWRStoreState.Completed("data3"), expectMostRecentItem())
+        }
+    }
+
+    @Test
     fun withKeepPreviousDataOnError() = runTest {
         val holder = KeepPreviousDataHolder<String>()
         val cacheOwner = SWRCacheOwner()
