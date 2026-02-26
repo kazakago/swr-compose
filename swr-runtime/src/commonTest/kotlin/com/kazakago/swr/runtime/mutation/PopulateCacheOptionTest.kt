@@ -69,4 +69,41 @@ class PopulateCacheOptionTest {
             assertEquals(SWRStoreState.Completed("fetched_2"), expectMostRecentItem())
         }
     }
+
+    @Test
+    fun withPopulateCache() = runTest {
+        val lifecycleOwner = TestLifecycleOwner()
+        var result: () -> String = { "fetched_1" }
+        val swr = SWR(
+            key = "key",
+            fetcher = {
+                delay(100)
+                result()
+            },
+            lifecycleOwner = lifecycleOwner,
+            scope = backgroundScope,
+            cacheOwner = SWRCacheOwner(),
+            networkMonitor = TestNetworkMonitor(),
+        )
+        swr.stateFlow.test {
+            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
+            advanceTimeBy(101)
+            assertEquals(SWRStoreState.Completed("fetched_1"), expectMostRecentItem())
+
+            advanceTimeBy(2500)
+            result = { "fetched_2" }
+            launch {
+                swr.mutate(data = {
+                    delay(100)
+                    "mutated"
+                }) {
+                    populateCache = true
+                    revalidate = false
+                }
+            }
+            advanceTimeBy(101)
+            // populateCache=true should write "mutated" to cache directly
+            assertEquals(SWRStoreState.Completed("mutated"), expectMostRecentItem())
+        }
+    }
 }

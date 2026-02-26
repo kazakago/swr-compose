@@ -67,4 +67,42 @@ class RevalidateOptionTest {
             assertEquals(SWRStoreState.Completed("mutated"), expectMostRecentItem())
         }
     }
+
+    @Test
+    fun withRevalidate() = runTest {
+        val lifecycleOwner = TestLifecycleOwner()
+        var result: () -> String = { "fetched_1" }
+        val swr = SWR(
+            key = "key",
+            fetcher = {
+                delay(100)
+                result()
+            },
+            lifecycleOwner = lifecycleOwner,
+            scope = backgroundScope,
+            cacheOwner = SWRCacheOwner(),
+            networkMonitor = TestNetworkMonitor(),
+        )
+        swr.stateFlow.test {
+            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
+            advanceTimeBy(101)
+            assertEquals(SWRStoreState.Completed("fetched_1"), expectMostRecentItem())
+
+            advanceTimeBy(2500)
+            result = { "fetched_2" }
+            launch {
+                swr.mutate(data = {
+                    delay(100)
+                    "mutated"
+                }) {
+                    revalidate = true
+                }
+            }
+            advanceTimeBy(101)
+            assertEquals(SWRStoreState.Loading("mutated"), expectMostRecentItem())
+            advanceTimeBy(101)
+            // Should revalidate and get fetched_2
+            assertEquals(SWRStoreState.Completed("fetched_2"), expectMostRecentItem())
+        }
+    }
 }

@@ -268,6 +268,82 @@ class SWRMutateTest {
     }
 
     @Test
+    fun validate_mutationWithOptimisticData() = runTest {
+        val lifecycleOwner = TestLifecycleOwner()
+        val swr = SWR(
+            key = "key",
+            fetcher = {
+                delay(100)
+                "fetched"
+            },
+            lifecycleOwner = lifecycleOwner,
+            scope = backgroundScope,
+            cacheOwner = SWRCacheOwner(),
+            networkMonitor = TestNetworkMonitor(),
+        )
+        swr.stateFlow.test {
+            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
+            advanceTimeBy(101)
+            assertEquals(SWRStoreState.Completed("fetched"), expectMostRecentItem())
+
+            advanceTimeBy(2500)
+            launch {
+                swr.mutate(data = {
+                    delay(100)
+                    "mutated"
+                }) {
+                    optimisticData = "optimistic"
+                    revalidate = false
+                }
+            }
+            advanceTimeBy(1)
+            // Optimistic data should appear immediately
+            assertEquals(SWRStoreState.Completed("optimistic"), expectMostRecentItem())
+            advanceTimeBy(100)
+            // After mutation completes, mutated data should appear via populateCache (default true)
+            assertEquals(SWRStoreState.Completed("mutated"), expectMostRecentItem())
+        }
+    }
+
+    @Test
+    fun validate_mutationWithOptimisticDataRollback() = runTest {
+        val lifecycleOwner = TestLifecycleOwner()
+        val error = IllegalStateException()
+        val swr = SWR(
+            key = "key",
+            fetcher = {
+                delay(100)
+                "fetched"
+            },
+            lifecycleOwner = lifecycleOwner,
+            scope = backgroundScope,
+            cacheOwner = SWRCacheOwner(),
+            networkMonitor = TestNetworkMonitor(),
+        )
+        swr.stateFlow.test {
+            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
+            advanceTimeBy(101)
+            assertEquals(SWRStoreState.Completed("fetched"), expectMostRecentItem())
+
+            advanceTimeBy(2500)
+            launch {
+                swr.mutate(data = {
+                    delay(100)
+                    throw error
+                }) {
+                    optimisticData = "optimistic"
+                    rollbackOnError = true
+                }
+            }
+            advanceTimeBy(1)
+            assertEquals(SWRStoreState.Completed("optimistic"), expectMostRecentItem())
+            advanceTimeBy(100)
+            // Rollback restores previous data with keepState=true (Fixed state preserved)
+            assertEquals(SWRStoreState.Completed("fetched"), expectMostRecentItem())
+        }
+    }
+
+    @Test
     fun validateFailed_mutationWithDataFailed() = runTest {
         val lifecycleOwner = TestLifecycleOwner()
         val error = IllegalStateException()
