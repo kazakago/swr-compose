@@ -3,7 +3,6 @@ name: create-pr
 description: Create a PR from the current commits.
 argument-hint: [-b <base-branch>] [-d (draft)] [-p (include prompt)]
 model: sonnet
-context: fork
 ---
 
 # Create PR
