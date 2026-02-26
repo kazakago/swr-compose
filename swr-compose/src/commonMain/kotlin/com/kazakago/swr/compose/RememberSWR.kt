@@ -12,6 +12,8 @@ import com.kazakago.swr.runtime.SWR
 import com.kazakago.swr.runtime.SWRConfig
 import com.kazakago.swr.runtime.internal.NetworkMonitor
 import com.kazakago.swr.runtime.internal.buildNetworkMonitor
+import com.kazakago.swr.runtime.KeepPreviousDataHolder
+import com.kazakago.swr.runtime.withKeepPreviousData
 import com.kazakago.swr.store.persister.Persister
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.map
@@ -30,6 +32,7 @@ public fun <KEY : Any, DATA> rememberSWR(
         val defaultConfig = LocalSWRConfig.current
         val lifecycleOwner = LocalLifecycleOwner.current
         val networkMonitor = networkMonitor ?: buildNetworkMonitor()
+        val previousDataHolder = remember { KeepPreviousDataHolder<DATA>() }
         val swr = remember(key) {
             SWR(
                 key = key,
@@ -43,8 +46,12 @@ public fun <KEY : Any, DATA> rememberSWR(
                 config = config,
             )
         }
-        swr.stateFlow
-            .map { it.toSWRState(swr.mutate) }
+        val flow = if (swr.keepPreviousData) {
+            swr.stateFlow.withKeepPreviousData(previousDataHolder)
+        } else {
+            swr.stateFlow
+        }
+        flow.map { it.toSWRState(swr.mutate) }
             .collectAsStateWithLifecycle(SWRState.initialize())
             .value
     } else {

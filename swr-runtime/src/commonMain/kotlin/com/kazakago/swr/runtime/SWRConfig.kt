@@ -29,6 +29,7 @@ public class SWRConfig<KEY : Any, DATA>(
     public var revalidateAll: Boolean = false,
     public var revalidateFirstPage: Boolean = true,
     public var persistSize: Boolean = false,
+    public var keepPreviousData: Boolean = false,
 ) {
     @Suppress("UNCHECKED_CAST")
     public constructor(config: SWRConfig<Any, Any>) : this(
@@ -53,5 +54,6 @@ public class SWRConfig<KEY : Any, DATA>(
         revalidateAll = config.revalidateAll,
         revalidateFirstPage = config.revalidateFirstPage,
         persistSize = config.persistSize,
+        keepPreviousData = config.keepPreviousData,
     )
 }
