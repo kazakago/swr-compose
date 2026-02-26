@@ -1,6 +1,7 @@
 package com.kazakago.swr.runtime.internal
 
 import com.kazakago.swr.runtime.DedupingIntervalException
+import com.kazakago.swr.runtime.PausedException
 import com.kazakago.swr.runtime.SWRConfig
 import com.kazakago.swr.runtime.SWRValidateOptions
 import com.kazakago.swr.store.SWRStore
@@ -18,6 +19,9 @@ internal class SWRValidate<KEY : Any, DATA>(
     private var dedupingIntervalJob: Job? = null
 
     suspend operator fun invoke(options: SWRValidateOptions? = null): Result<DATA> {
+        if (config.isPaused?.invoke() == true) {
+            return Result.failure(PausedException())
+        }
         if (dedupingIntervalJob?.isActive == true && options == null) {
             return Result.failure(DedupingIntervalException())
         }
