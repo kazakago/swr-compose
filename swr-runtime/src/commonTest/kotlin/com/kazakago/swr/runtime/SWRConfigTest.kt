@@ -28,6 +28,7 @@ class SWRConfigTest {
             revalidateFirstPage = false
             persistSize = true
             keepPreviousData = true
+            isPaused = { true }
         }
 
         val copied = SWRConfig<String, String>(original)
@@ -50,6 +51,7 @@ class SWRConfigTest {
         assertEquals(original.revalidateFirstPage, copied.revalidateFirstPage)
         assertEquals(original.persistSize, copied.persistSize)
         assertEquals(original.keepPreviousData, copied.keepPreviousData)
+        assertEquals(original.isPaused, copied.isPaused)
         // fallbackData is intentionally not copied (always null after copy)
         assertNull(copied.fallbackData)
     }
@@ -78,6 +80,7 @@ class SWRConfigTest {
         assertEquals(true, copied.revalidateFirstPage)
         assertEquals(false, copied.persistSize)
         assertEquals(false, copied.keepPreviousData)
+        assertNull(copied.isPaused)
     }
 
     @Test
