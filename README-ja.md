@@ -100,6 +100,7 @@ https://swr.vercel.app/docs/options
 | onLoadingSlow          |                                                                              | ローディングが `loadingTimeout` を超えた時のコールバック |
 | onSuccess              |                                                                              | データフェッチ成功時のコールバック                     |
 | onError                |                                                                              | フェッチエラー時のコールバック                        |
+| keepPreviousData       | false                                                                        | キー変更時に以前のデータを保持する                    |
 | onErrorRetry           | [指数バックオフ](https://en.wikipedia.org/wiki/Exponential_backoff)            | カスタムエラーリトライハンドラ                        |
 
 ## ミューテーション
