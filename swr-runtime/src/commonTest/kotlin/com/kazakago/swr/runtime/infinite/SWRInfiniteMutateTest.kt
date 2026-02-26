@@ -9,6 +9,7 @@ import com.kazakago.swr.store.cache.SWRCacheOwner
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.resetMain
@@ -18,10 +19,9 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertIs
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class SWRInfiniteTest {
+class SWRInfiniteMutateTest {
 
     @BeforeTest
     fun setUp() {
@@ -34,89 +34,38 @@ class SWRInfiniteTest {
     }
 
     @Test
-    fun validate() = runTest {
-        val swr = SWRInfinite<String, String>(
-            getKey = { pageIndex, _ -> "key_${pageIndex}" },
-            fetcher = {
-                delay(100)
-                "data"
-            },
-            lifecycleOwner = TestLifecycleOwner(),
-            scope = backgroundScope,
-            cacheOwner = SWRCacheOwner(),
-            networkMonitor = TestNetworkMonitor(),
-        )
-        swr.stateFlow.test {
-            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
-            advanceTimeBy(101)
-            assertEquals(SWRStoreState.Completed(listOf("data")), expectMostRecentItem())
-        }
-    }
-
-    @Test
-    fun incrementSetSize() = runTest {
-        val swr = SWRInfinite<String, String>(
-            getKey = { pageIndex, _ -> "key_${pageIndex}" },
-            fetcher = {
-                delay(100)
-                "fetched_$it"
-            },
-            lifecycleOwner = TestLifecycleOwner(),
-            scope = backgroundScope,
-            cacheOwner = SWRCacheOwner(),
-            networkMonitor = TestNetworkMonitor(),
-        )
-        swr.stateFlow.test {
-            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
-            assertEquals(1, swr.getSize())
-            advanceTimeBy(101)
-            assertEquals(SWRStoreState.Completed(listOf("fetched_key_0")), expectMostRecentItem())
-            assertEquals(1, swr.getSize())
-
-            swr.setSize(swr.getSize() + 1)
-            advanceTimeBy(1)
-            assertEquals(SWRStoreState.Loading(listOf("fetched_key_0", null)), expectMostRecentItem())
-            assertEquals(2, swr.getSize())
-            advanceTimeBy(100)
-            assertEquals(SWRStoreState.Completed(listOf("fetched_key_0", "fetched_key_1")), expectMostRecentItem())
-            assertEquals(2, swr.getSize())
-        }
-    }
-
-    @Test
-    fun errorOnSecondPage() = runTest {
-        val error = RuntimeException("page 1 failed")
+    fun mutateRevalidation() = runTest {
+        var fetchCount = 0
         val swr = SWRInfinite<String, String>(
             getKey = { pageIndex, _ -> "key_$pageIndex" },
             fetcher = { key ->
+                fetchCount++
                 delay(100)
-                if (key == "key_1") throw error else "fetched_$key"
+                "fetched_${key}_$fetchCount"
             },
             lifecycleOwner = TestLifecycleOwner(),
             scope = backgroundScope,
             cacheOwner = SWRCacheOwner(),
             networkMonitor = TestNetworkMonitor(),
         ) {
-            shouldRetryOnError = false
+            dedupingInterval = kotlin.time.Duration.ZERO
         }
         swr.stateFlow.test {
             assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
             advanceTimeBy(101)
-            assertEquals(SWRStoreState.Completed(listOf("fetched_key_0")), expectMostRecentItem())
+            assertEquals(SWRStoreState.Completed(listOf("fetched_key_0_1")), expectMostRecentItem())
 
-            swr.setSize(2)
-            advanceTimeBy(1)
-            assertEquals(SWRStoreState.Loading(listOf("fetched_key_0", null)), expectMostRecentItem())
-            advanceTimeBy(100)
-            val state = expectMostRecentItem()
-            assertIs<SWRStoreState.Error<List<String?>>>(state)
-            assertEquals(error, state.error)
-            assertEquals("fetched_key_0", state.data?.get(0))
+            // Mutate without data triggers revalidation
+            launch {
+                swr.mutate()
+            }
+            advanceTimeBy(201)
+            assertEquals(SWRStoreState.Completed(listOf("fetched_key_0_2")), expectMostRecentItem())
         }
     }
 
     @Test
-    fun decrementSetSize() = runTest {
+    fun mutateWithData() = runTest {
         val swr = SWRInfinite<String, String>(
             getKey = { pageIndex, _ -> "key_$pageIndex" },
             fetcher = { key ->
@@ -127,28 +76,101 @@ class SWRInfiniteTest {
             scope = backgroundScope,
             cacheOwner = SWRCacheOwner(),
             networkMonitor = TestNetworkMonitor(),
-        )
+        ) {
+            dedupingInterval = kotlin.time.Duration.ZERO
+        }
         swr.stateFlow.test {
             assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
             advanceTimeBy(101)
             assertEquals(SWRStoreState.Completed(listOf("fetched_key_0")), expectMostRecentItem())
 
-            // Grow to 3 pages
-            swr.setSize(3)
-            advanceTimeBy(201)
-            assertEquals(
-                SWRStoreState.Completed(listOf("fetched_key_0", "fetched_key_1", "fetched_key_2")),
-                expectMostRecentItem(),
-            )
-            assertEquals(3, swr.getSize())
+            // Mutate with explicit data and no revalidation
+            launch {
+                swr.mutate(data = { listOf("manual_data") }) {
+                    revalidate = false
+                    populateCache = true
+                }
+            }
+            advanceTimeBy(1)
+            assertEquals(SWRStoreState.Completed(listOf("manual_data")), expectMostRecentItem())
+        }
+    }
 
-            // Shrink back to 1 page
-            swr.setSize(1)
+    @Test
+    fun mutateOptimistic() = runTest {
+        val swr = SWRInfinite<String, String>(
+            getKey = { pageIndex, _ -> "key_$pageIndex" },
+            fetcher = { key ->
+                delay(100)
+                "fetched_$key"
+            },
+            lifecycleOwner = TestLifecycleOwner(),
+            scope = backgroundScope,
+            cacheOwner = SWRCacheOwner(),
+            networkMonitor = TestNetworkMonitor(),
+        ) {
+            dedupingInterval = kotlin.time.Duration.ZERO
+        }
+        swr.stateFlow.test {
+            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
             advanceTimeBy(101)
-            val state = expectMostRecentItem()
-            assertEquals(1, swr.getSize())
-            assertIs<SWRStoreState<List<String?>>>(state)
-            assertEquals(1, state.data?.size)
+            assertEquals(SWRStoreState.Completed(listOf("fetched_key_0")), expectMostRecentItem())
+
+            // Optimistic update
+            launch {
+                swr.mutate(data = {
+                    delay(100)
+                    listOf("final_data")
+                }) {
+                    optimisticData = listOf("optimistic_data")
+                    revalidate = false
+                    populateCache = true
+                }
+            }
+            advanceTimeBy(1)
+            assertEquals(SWRStoreState.Completed(listOf("optimistic_data")), expectMostRecentItem())
+            advanceTimeBy(100)
+            assertEquals(SWRStoreState.Completed(listOf("final_data")), expectMostRecentItem())
+        }
+    }
+
+    @Test
+    fun mutateRollbackOnError() = runTest {
+        val error = RuntimeException("mutation failed")
+        val swr = SWRInfinite<String, String>(
+            getKey = { pageIndex, _ -> "key_$pageIndex" },
+            fetcher = { key ->
+                delay(100)
+                "fetched_$key"
+            },
+            lifecycleOwner = TestLifecycleOwner(),
+            scope = backgroundScope,
+            cacheOwner = SWRCacheOwner(),
+            networkMonitor = TestNetworkMonitor(),
+        ) {
+            dedupingInterval = kotlin.time.Duration.ZERO
+        }
+        swr.stateFlow.test {
+            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
+            advanceTimeBy(101)
+            assertEquals(SWRStoreState.Completed(listOf("fetched_key_0")), expectMostRecentItem())
+
+            // Optimistic update then error with rollback
+            launch {
+                swr.mutate(data = {
+                    delay(100)
+                    throw error
+                }) {
+                    optimisticData = listOf("optimistic")
+                    rollbackOnError = true
+                    revalidate = false
+                }
+            }
+            advanceTimeBy(1)
+            assertEquals(SWRStoreState.Completed(listOf("optimistic")), expectMostRecentItem())
+            advanceTimeBy(100)
+            // Should rollback to original data
+            assertEquals(SWRStoreState.Completed(listOf("fetched_key_0")), expectMostRecentItem())
         }
     }
 }

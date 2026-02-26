@@ -19,6 +19,7 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class OptimisticOptionTest {
@@ -69,6 +70,79 @@ class OptimisticOptionTest {
             assertEquals(SWRStoreState.Loading("mutated"), expectMostRecentItem())
             advanceTimeBy(100)
             assertEquals(SWRStoreState.Completed("fetched_2"), expectMostRecentItem())
+        }
+    }
+
+    @Test
+    fun withOptimisticDataRollbackOnError() = runTest {
+        val lifecycleOwner = TestLifecycleOwner()
+        val error = IllegalStateException()
+        val swr = SWR(
+            key = "key",
+            fetcher = {
+                delay(100)
+                "fetched"
+            },
+            lifecycleOwner = lifecycleOwner,
+            scope = backgroundScope,
+            cacheOwner = SWRCacheOwner(),
+            networkMonitor = TestNetworkMonitor(),
+        )
+        swr.stateFlow.test {
+            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
+            advanceTimeBy(101)
+            assertEquals(SWRStoreState.Completed("fetched"), expectMostRecentItem())
+
+            advanceTimeBy(2500)
+            launch {
+                swr.mutate(data = {
+                    delay(100)
+                    throw error
+                }) {
+                    optimisticData = "optimistic"
+                    rollbackOnError = true
+                }
+            }
+            advanceTimeBy(1)
+            assertEquals(SWRStoreState.Completed("optimistic"), expectMostRecentItem())
+            advanceTimeBy(100)
+            // Rollback restores previous data with keepState=true (Fixed state preserved)
+            assertEquals(SWRStoreState.Completed("fetched"), expectMostRecentItem())
+        }
+    }
+
+    @Test
+    fun noOptimisticData() = runTest {
+        val lifecycleOwner = TestLifecycleOwner()
+        val swr = SWR(
+            key = "key",
+            fetcher = {
+                delay(100)
+                "fetched"
+            },
+            lifecycleOwner = lifecycleOwner,
+            scope = backgroundScope,
+            cacheOwner = SWRCacheOwner(),
+            networkMonitor = TestNetworkMonitor(),
+        )
+        swr.stateFlow.test {
+            assertEquals(SWRStoreState.Loading(null), expectMostRecentItem())
+            advanceTimeBy(101)
+            assertEquals(SWRStoreState.Completed("fetched"), expectMostRecentItem())
+
+            advanceTimeBy(2500)
+            launch {
+                swr.mutate(data = {
+                    delay(100)
+                    "mutated"
+                }) {
+                    // No optimisticData set — state should not change immediately
+                }
+            }
+            advanceTimeBy(1)
+            expectNoEvents() // No immediate state change without optimistic data
+            advanceTimeBy(100)
+            assertEquals(SWRStoreState.Loading("mutated"), expectMostRecentItem())
         }
     }
 }
