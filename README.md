@@ -100,6 +100,7 @@ https://swr.vercel.app/docs/options
 | onLoadingSlow         |                                                                            | Callback when loading exceeds `loadingTimeout`     |
 | onSuccess             |                                                                            | Callback on successful data fetch                  |
 | onError               |                                                                            | Callback on fetch error                            |
+| keepPreviousData      | false                                                                      | Keep previous data when key changes                |
 | onErrorRetry          | [Exponential backoff](https://en.wikipedia.org/wiki/Exponential_backoff)   | Custom error retry handler                         |
 
 ## Mutation
