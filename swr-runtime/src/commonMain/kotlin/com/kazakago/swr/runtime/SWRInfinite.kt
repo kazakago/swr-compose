@@ -33,6 +33,7 @@ public class SWRInfinite<KEY : Any, DATA>(
     private var swrList: List<SWRInternal<KEY, DATA>?> = emptyList()
     public var pageSize: MutableStateFlow<Int> = MutableStateFlow(initialConfig.initialSize)
     public var previousFirstKey: KEY? = null
+    private val previousDataHolder: KeepPreviousDataHolder<List<DATA?>> = KeepPreviousDataHolder()
 
     init {
         scope.launch {
@@ -90,8 +91,11 @@ public class SWRInfinite<KEY : Any, DATA>(
                                 SWRStoreState.Completed(data)
                             }
                         },
-                    ).collect {
-                        _stateFlow.value = it
+                    ).let { flow ->
+                        if (initialConfig.keepPreviousData) flow.withKeepPreviousData(previousDataHolder)
+                        else flow
+                    }.collect { state ->
+                        _stateFlow.value = state
                     }
                 }
             }

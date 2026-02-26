@@ -25,17 +25,21 @@ public class SWR<KEY : Any, DATA>(
     defaultConfig: SWRConfig<Any, Any> = defaultSWRConfig,
     config: SWRConfig<KEY, DATA>.() -> Unit = {},
 ) {
+    private val resolvedConfig: SWRConfig<KEY, DATA> = SWRConfig<KEY, DATA>(defaultConfig).apply(config)
+
     private val swrInternal = if (key != null) {
         SWRInternal(
             store = SWRStore(key, fetcher, persister, cacheOwner),
             lifecycleOwner = lifecycleOwner,
             scope = scope,
             networkMonitor = networkMonitor,
-            config = SWRConfig<KEY, DATA>(defaultConfig).apply(config),
+            config = resolvedConfig,
         )
     } else {
         null
     }
+
+    public val keepPreviousData: Boolean = resolvedConfig.keepPreviousData
 
     public val stateFlow: StateFlow<SWRStoreState<DATA>> = swrInternal?.stateFlow ?: MutableStateFlow(SWRStoreState.initialize())
 
