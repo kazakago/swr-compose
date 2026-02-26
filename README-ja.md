@@ -101,6 +101,7 @@ https://swr.vercel.app/docs/options
 | onSuccess              |                                                                              | データフェッチ成功時のコールバック                     |
 | onError                |                                                                              | フェッチエラー時のコールバック                        |
 | keepPreviousData       | false                                                                        | キー変更時に以前のデータを保持する                    |
+| isPaused               |                                                                              | trueを返す間すべての再検証を一時停止する               |
 | onErrorRetry           | [指数バックオフ](https://en.wikipedia.org/wiki/Exponential_backoff)            | カスタムエラーリトライハンドラ                        |
 
 ## ミューテーション
