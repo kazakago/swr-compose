@@ -8,7 +8,7 @@ mavenPublishing {
     signAllPublications()
     coordinates(
         groupId = "com.kazakago.swr",
-        version = "0.11.0",
+        version = "0.11.1",
     )
     pom {
         name.set("swr-compose")
