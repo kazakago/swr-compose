@@ -41,6 +41,7 @@ public class SWRConfig<KEY : Any, DATA>(
         refreshWhenHidden = config.refreshWhenHidden,
         refreshWhenOffline = config.refreshWhenOffline,
         shouldRetryOnError = config.shouldRetryOnError,
+        dedupingInterval = config.dedupingInterval,
         focusThrottleInterval = config.focusThrottleInterval,
         loadingTimeout = config.loadingTimeout,
         errorRetryInterval = config.errorRetryInterval,
