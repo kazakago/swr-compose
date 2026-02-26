@@ -18,30 +18,9 @@ The following options are accepted:
 
 ## 2. Branch Check
 
-1. Get the current branch name:
+If the current branch is `main`, `production`, or the branch specified with `-b`, create a new branch with an appropriate name before committing.
 
-```bash
-git branch --show-current
-```
-
-2. Check if the current branch matches any of the following:
-
-- `main`
-- `production`
-- The branch specified with `-b`
-
-If any match is found, perform the following steps:
-
-1. Determine an appropriate branch name
-2. Create the branch with `git checkout -b <branch-name>`
-
-## 3. Check Current Status
-
-```bash
-git status
-```
-
-## 4. Commit Strategy
+## 3. Commit Strategy
 
 - Consider all changes for commits, regardless of whether they are staged or unstaged
 - If the same file has both staged and unstaged changes, combine them into a single commit
@@ -50,6 +29,7 @@ git status
 - Keep commit granularity small enough that the commit message fits in one line
   - If a change cannot be described in one line, split it further
 - Write commit messages in English
+- Before committing, reorganize staging as needed to ensure each commit contains only relevant files
 
 ### Bad Example
 
@@ -64,26 +44,7 @@ fix: Fix multiple bugs
 :bug: Fix character encoding issue in username display
 ```
 
-## 5. Organize Staging
-
-Before committing, check the current staging state and reorganize as needed.
-
-```bash
-# If files are already staged, unstage everything first
-git reset HEAD
-```
-
-Stage only the relevant files for each commit to ensure meaningful granularity.
-
-## 6. Execute Commits
-
-Stage and commit changes. For each commit, follow these steps:
-
-1. Stage target files: `git add <file>`
-2. Execute commit: `git commit -m "<message>"`
-3. Repeat steps 1-2 for subsequent commits
-
 ## Notes
 
-- Never commit directly to main or production; always create a separate branch
+- Never commit directly to `main` or `production`; always create a separate branch
 - Separate unrelated changes into different commits
