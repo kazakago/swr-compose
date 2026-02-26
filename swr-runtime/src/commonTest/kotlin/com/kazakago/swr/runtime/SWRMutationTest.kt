@@ -325,6 +325,49 @@ class SWRMutationTest {
     }
 
     @Test
+    fun trigger_concurrent_same_key() = runTest {
+        val cacheOwner = SWRCacheOwner()
+        val mutation = SWRMutation<String, String, String>(
+            key = "key",
+            fetcher = { _, arg ->
+                delay(100)
+                "result:$arg"
+            },
+            cacheOwner = cacheOwner,
+        )
+        // Launch two mutations concurrently
+        val job1 = backgroundScope.launch { mutation.trigger("first") { revalidate = false } }
+        val job2 = backgroundScope.launch { mutation.trigger("second") { revalidate = false } }
+        advanceTimeBy(101)
+        job1.join()
+        job2.join()
+        // Both should complete; last written value wins
+        assertTrue(mutation.data.value in listOf("result:first", "result:second"))
+        assertFalse(mutation.isMutating.value)
+        assertNull(mutation.error.value)
+    }
+
+    @Test
+    fun trigger_concurrent_error_and_success() = runTest {
+        val error = RuntimeException("boom")
+        val mutation = SWRMutation<String, String, String>(
+            key = "key",
+            fetcher = { _, arg ->
+                delay(100)
+                if (arg == "fail") throw error else "result:$arg"
+            },
+            cacheOwner = SWRCacheOwner(),
+        )
+        val job1 = backgroundScope.launch { mutation.trigger("fail") { revalidate = false } }
+        val job2 = backgroundScope.launch { mutation.trigger("ok") { revalidate = false } }
+        advanceTimeBy(101)
+        job1.join()
+        job2.join()
+        // Both completed; final state depends on execution order
+        assertFalse(mutation.isMutating.value)
+    }
+
+    @Test
     fun trigger_revalidate_false() = runTest {
         var fetchCount = 0
         val cacheOwner = SWRCacheOwner()
