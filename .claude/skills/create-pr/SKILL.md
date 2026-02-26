@@ -34,20 +34,13 @@ Examples:
 
 ## 3. Pre-checks
 
-```bash
-git status
-git log --oneline <base-branch>..HEAD
-git diff <base-branch>...HEAD --stat
-```
+Review the commit log and diff against the base branch to understand the full scope of changes.
 
 ## 4. Retrieve Prompt (only when -p option is specified)
 
-If the `-p` option is specified, follow these steps:
+If the `-p` option is specified, execute the `/export-prompt` command and keep the retrieved prompts for later use.
 
-1. Execute the `/export-prompt` command to retrieve the session prompts
-2. Keep the retrieved prompts for later use in the PR body
-
-## 5. Create PR
+## 5. Compose PR Body
 
 Use the template (@.github/PULL_REQUEST_TEMPLATE.md) to compose the PR body.
 
@@ -80,24 +73,19 @@ If the `-p` option is specified, append the following to the end of the template
 </details>
 ````
 
-## 6. Push to Remote
+### Attribution
 
-```bash
-git push -u origin <current-branch-name>
+Always append the following line at the very end of the PR body:
+
+```
+---
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
 ```
 
-## 7. Create PR with gh Command
+## 6. Push and Create PR
 
-```bash
-# For normal PR
-gh pr create --base <base-branch> --title "<PR title>" --body "<body>"
+Push the branch and create the PR. Use `--draft` flag if `-d` option was specified.
 
-# For draft PR (when -d option is specified)
-gh pr create --base <base-branch> --title "<PR title>" --body "<body>" --draft
-```
-
-- Write the title concisely in English, describing the changes
-- Write the body following the template
 - If including related URLs, verify they are accessible and not 404
 - Do not include links to changed files in related URLs (they can be viewed in the PR diff)
 - Only include meaningful links in related URLs. Leaving it empty is fine
