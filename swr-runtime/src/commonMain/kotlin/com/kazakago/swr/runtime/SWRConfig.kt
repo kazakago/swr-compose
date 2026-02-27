@@ -30,6 +30,7 @@ public class SWRConfig<KEY : Any, DATA>(
     public var revalidateFirstPage: Boolean = true,
     public var persistSize: Boolean = false,
     public var keepPreviousData: Boolean = false,
+    public var parallel: Boolean = false,
     public var isPaused: (() -> Boolean)? = null,
 ) {
     @Suppress("UNCHECKED_CAST")
@@ -57,6 +58,7 @@ public class SWRConfig<KEY : Any, DATA>(
         revalidateFirstPage = config.revalidateFirstPage,
         persistSize = config.persistSize,
         keepPreviousData = config.keepPreviousData,
+        parallel = config.parallel,
         isPaused = config.isPaused,
     )
 }

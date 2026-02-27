@@ -40,6 +40,7 @@ public class SWRInfinite<KEY : Any, DATA>(
             pageSize.collect { pageSize ->
                 swrList = buildList {
                     var previousPageData: DATA? = null
+                    val isParallel = initialConfig.parallel
                     repeat(pageSize) { pageIndex ->
                         @Suppress("UNCHECKED_CAST")
                         val currentConfig = SWRConfig<KEY, DATA>(initialConfig as SWRConfig<Any, Any>).apply {
@@ -47,7 +48,11 @@ public class SWRInfinite<KEY : Any, DATA>(
                             revalidateOnFocus = revalidateOnFocus && (revalidateAll || (revalidateFirstPage && pageIndex == 0))
                             revalidateOnReconnect = revalidateOnReconnect && (revalidateAll || (revalidateFirstPage && pageIndex == 0))
                         }
-                        val key = getKey(pageIndex, previousPageData)
+                        val key = if (isParallel) {
+                            getKey(pageIndex, null)
+                        } else {
+                            getKey(pageIndex, previousPageData)
+                        }
                         if (!currentConfig.persistSize && pageIndex == 0) {
                             if (previousFirstKey != null && previousFirstKey != key) {
                                 previousFirstKey = null
@@ -60,11 +65,13 @@ public class SWRInfinite<KEY : Any, DATA>(
                         if (key != null) {
                             val swr = swrList.getOrNull(pageIndex)
                             if (swr != null && swr.store.key == key) {
-                                previousPageData = null
+                                if (!isParallel) previousPageData = null
                                 add(swr)
                             } else {
                                 val store = SWRStore(key, fetcher, persister, cacheOwner)
-                                previousPageData = store.get(from = GettingFrom.LocalOnly).getOrNull()
+                                if (!isParallel) {
+                                    previousPageData = store.get(from = GettingFrom.LocalOnly).getOrNull()
+                                }
                                 add(SWRInternal(store, lifecycleOwner, scope, networkMonitor, currentConfig))
                             }
                         } else {
