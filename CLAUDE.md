@@ -75,9 +75,9 @@ Most tests live in `swr-runtime` module under `commonTest`. The `swr-store` modu
 
 ## Example App
 ```bash
-./gradlew :exampleApp:run                    # Desktop (JVM)
-./gradlew :exampleApp:wasmJsBrowserRun       # Web (WASM)
-./gradlew :exampleApp:installDebug           # Android
+./gradlew :desktopApp:run                # Desktop (JVM)
+./gradlew :webApp:wasmJsBrowserRun       # Web (WASM)
+./gradlew :androidApp:installDebug       # Android
 ```
 
 # Coding Conventions
