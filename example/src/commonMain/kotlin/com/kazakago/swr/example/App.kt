@@ -37,11 +37,14 @@ import com.kazakago.swr.example.basic.PrefetchingNextRoute
 import com.kazakago.swr.example.basic.PrefetchingNextScreen
 import com.kazakago.swr.example.basic.PrefetchingRoute
 import com.kazakago.swr.example.basic.PrefetchingScreen
+import com.kazakago.swr.example.basic.SubscriptionRoute
+import com.kazakago.swr.example.basic.SubscriptionScreen
 import com.kazakago.swr.example.todolist.ToDoListRoute
 import com.kazakago.swr.example.todolist.ToDoListScreen
 import com.kazakago.swr.example.todolist.server.LocalMockServer
 import com.kazakago.swr.example.todolist.server.MockServer
 import com.kazakago.swr.example.todolist.server.MockServerSucceed
+import kotlinx.coroutines.GlobalScope
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.polymorphic
 
@@ -66,6 +69,7 @@ fun App(
                 subclass(SWRMutationRoute::class, SWRMutationRoute.serializer())
                 subclass(PaginationRoute::class, PaginationRoute.serializer())
                 subclass(InfinitePaginationRoute::class, InfinitePaginationRoute.serializer())
+                subclass(SubscriptionRoute::class, SubscriptionRoute.serializer())
                 subclass(PrefetchingRoute::class, PrefetchingRoute.serializer())
                 subclass(ToDoListRoute::class, ToDoListRoute.serializer())
             }
@@ -87,6 +91,7 @@ fun App(
                 moveToSWRMutation = { backStack.add(SWRMutationRoute) },
                 moveToPagination = { backStack.add(PaginationRoute) },
                 moveToInfinitePagination = { backStack.add(InfinitePaginationRoute) },
+                moveToSubscription = { backStack.add(SubscriptionRoute) },
                 moveToPrefetching = { backStack.add(PrefetchingRoute) },
                 moveToTodoList = { backStack.add(ToDoListRoute) },
             )
@@ -143,6 +148,11 @@ fun App(
         }
         entry<InfinitePaginationRoute> {
             InfinitePaginationScreen(
+                onBack = backStack::removeLastOrNull,
+            )
+        }
+        entry<SubscriptionRoute> {
+            SubscriptionScreen(
                 onBack = backStack::removeLastOrNull,
             )
         }
