@@ -75,6 +75,7 @@ Kotlin/Wasm のライブデモは[**こちら**](https://kazakago.github.io/swr-
 | [ミューテーション](https://swr.vercel.app/docs/mutation)                         | `rememberSWRMutation()` で利用可能        |
 | [ページネーション](https://swr.vercel.app/docs/pagination)                       | `rememberSWRInfinite()` で利用可能        |
 | [データのプリフェッチ](https://swr.vercel.app/docs/prefetching)                   | `rememberSWRPreload()` で利用可能         |
+| [サブスクリプション](https://swr.vercel.app/docs/subscription)                    | `rememberSWRSubscription()` で利用可能    |
 
 ## 対応オプション
 
@@ -137,6 +138,34 @@ fun UpdateProfile() {
 | rollbackOnError | true      | ミューテーション失敗時に以前のデータに戻す            |
 | onSuccess      |            | ミューテーション成功時のコールバック                  |
 | onError        |            | ミューテーションエラー時のコールバック                |
+
+## サブスクリプション
+
+`rememberSWRSubscription()` は WebSocket、Server-Sent Events、Firestore などのリアルタイムデータソースとの統合を提供します。
+サブスクリプション経由で受信したデータは SWR キャッシュに書き込まれるため、同じキーを使う `rememberSWR()` も自動的に最新データを表示します。
+
+```kotlin
+@Composable
+fun LiveFeed() {
+    val (data, error) = rememberSWRSubscription(
+        key = "/ws/feed",
+        subscribe = { key ->
+            callbackFlow {
+                val ws = WebSocket(key) { message ->
+                    trySend(message)
+                }
+                awaitClose { ws.close() }
+            }
+        },
+    )
+
+    if (error != null) {
+        Text("error: ${error.message}")
+    } else {
+        Text("latest: ${data ?: "..."}")
+    }
+}
+```
 
 ## ページネーション / 無限ローディング
 
