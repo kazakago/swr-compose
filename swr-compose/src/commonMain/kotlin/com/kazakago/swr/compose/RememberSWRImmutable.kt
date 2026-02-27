@@ -16,6 +16,19 @@ import com.kazakago.swr.store.persister.Persister
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.map
 
+/**
+ * Fetches data for [key] once and never revalidates automatically.
+ *
+ * Equivalent to React SWR's `useSWRImmutable`. Use this for static or rarely changing data.
+ * [SWRState.mutate] can still be called to trigger a manual refresh.
+ *
+ * @param key The cache key. Pass `null` to suspend fetching until a non-null key is provided.
+ * @param fetcher Suspending function that fetches data for [key].
+ * @param persister Optional persistence layer for cross-session caching.
+ * @param scope CoroutineScope for the initial fetch. Defaults to the current composition scope.
+ * @param config Additional configuration options, merged with [LocalSWRConfig].
+ * @return The current [SWRState] as Compose state.
+ */
 @Composable
 public fun <KEY : Any, DATA> rememberSWRImmutable(
     key: KEY?,

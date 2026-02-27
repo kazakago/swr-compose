@@ -14,6 +14,21 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
+/**
+ * Runtime class that fetches and automatically revalidates data for a single key.
+ *
+ * Observes lifecycle events, network connectivity, and app focus to trigger
+ * automatic revalidation as configured. Equivalent to React SWR's `useSWR` hook logic.
+ * Used internally by [rememberSWR][com.kazakago.swr.compose.rememberSWR].
+ *
+ * @param key The cache key. Pass `null` to suspend fetching.
+ * @param fetcher Suspending function that fetches data for [key].
+ * @param lifecycleOwner Lifecycle used to observe focus and background transitions.
+ * @param scope CoroutineScope for revalidation jobs.
+ * @param persister Optional persistence layer for cross-session caching.
+ * @param cacheOwner Cache namespace. Defaults to [defaultSWRCacheOwner].
+ * @param config Additional configuration options, merged with [defaultConfig].
+ */
 public class SWR<KEY : Any, DATA>(
     key: KEY?,
     fetcher: suspend (key: KEY) -> DATA,
@@ -39,10 +54,13 @@ public class SWR<KEY : Any, DATA>(
         null
     }
 
+    /** Whether the `keepPreviousData` option is enabled in the resolved configuration. */
     public val keepPreviousData: Boolean = resolvedConfig.keepPreviousData
 
+    /** Flow of the current cache state for this key. */
     public val stateFlow: StateFlow<SWRStoreState<DATA>> = swrInternal?.stateFlow ?: MutableStateFlow(SWRStoreState.initialize())
 
+    /** Handle for programmatically mutating the cache entry for this key. */
     public val mutate: SWRMutate<DATA> = SWRMutate(
         get = { from -> swrInternal?.store?.get(from) ?: Result.failure(IllegalStateException("key is null")) },
         validate = { swrInternal?.validate() ?: Result.failure(IllegalStateException("key is null")) },

@@ -12,6 +12,22 @@ import com.kazakago.swr.store.persister.Persister
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * Subscribes to a real-time data source and returns the latest value as Compose state.
+ *
+ * Equivalent to React SWR's `useSWRSubscription`. The [subscribe] lambda returns a [Flow]
+ * whose emissions are written to the SWR cache and reflected in [SWRSubscriptionState.data].
+ *
+ * The subscription is cancelled only when [key] changes, not when the composable leaves
+ * composition. To keep the subscription alive across screen transitions, pass an external
+ * [scope] such as `viewModelScope`.
+ *
+ * @param key The cache key. Pass `null` to skip subscribing.
+ * @param scope CoroutineScope for collecting the subscription flow. Defaults to the current composition scope.
+ * @param persister Optional persistence layer for cross-session caching.
+ * @param subscribe Suspending function that returns a [Flow] of data for [key].
+ * @return The current [SWRSubscriptionState] as Compose state.
+ */
 @Composable
 public fun <KEY : Any, DATA> rememberSWRSubscription(
     key: KEY?,
