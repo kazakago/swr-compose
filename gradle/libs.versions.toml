@@ -50,5 +50,5 @@ kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", versio
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 androidApplication = { id = "com.android.application", version.ref = "androidPlugin" }
-androidLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "androidPlugin" }
+androidMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "androidPlugin" }
 buildLogicPublish = { id = "buildlogic.publish", version = "unspecified" }
