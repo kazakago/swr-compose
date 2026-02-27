@@ -51,8 +51,9 @@ kotlin {
             implementation(libs.kotlinxSerializationCore)
             implementation(libs.androidxNavigation3Ui)
         }
-        androidMain.dependencies {
-            implementation(libs.composeUiTooling)
-        }
     }
+}
+
+dependencies {
+    androidRuntimeClasspath(libs.composeUiTooling)
 }
