@@ -56,6 +56,7 @@ fun MainScreen(
     moveToSWRMutation: () -> Unit,
     moveToPagination: () -> Unit,
     moveToInfinitePagination: () -> Unit,
+    moveToSubscription: () -> Unit,
     moveToPrefetching: () -> Unit,
     moveToTodoList: () -> Unit,
 ) {
@@ -145,6 +146,12 @@ fun MainScreen(
                             }
                             moveToInfinitePagination()
                         }
+                        ExampleButton("Subscription") {
+                            if (isClearCache.value) {
+                                swrCacheOwner.clearAll()
+                            }
+                            moveToSubscription()
+                        }
                         ExampleButton("Prefetching") {
                             if (isClearCache.value) {
                                 swrCacheOwner.clearAll()
@@ -231,6 +238,7 @@ fun MainScreenPreview() {
             moveToSWRMutation = {},
             moveToPagination = {},
             moveToInfinitePagination = {},
+            moveToSubscription = {},
             moveToPrefetching = {},
             moveToTodoList = {},
         )

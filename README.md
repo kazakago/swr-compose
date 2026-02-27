@@ -75,6 +75,7 @@ Refer to the [**example module**](exampleApp) for details. This module works as 
 | [Mutation](https://swr.vercel.app/docs/mutation)                              | Available by `rememberSWRMutation()`    |
 | [Pagination](https://swr.vercel.app/docs/pagination)                          | Available by `rememberSWRInfinite()`    |
 | [Prefetching Data](https://swr.vercel.app/docs/prefetching)                   | Available by `rememberSWRPreload()`     |
+| [Subscription](https://swr.vercel.app/docs/subscription)                      | Available by `rememberSWRSubscription()` |
 
 ## Supported Options
 
@@ -136,6 +137,33 @@ fun UpdateProfile() {
 | rollbackOnError | true          | Revert to previous data if mutation fails            |
 | onSuccess       |               | Callback on successful mutation                      |
 | onError         |               | Callback on mutation error                           |
+
+## Subscription
+
+`rememberSWRSubscription()` integrates with real-time data sources such as WebSockets, Server-Sent Events, or Firestore. Data received via the subscription is written to the SWR cache, so any `rememberSWR()` using the same key automatically displays the latest data.
+
+```kotlin
+@Composable
+fun LiveFeed() {
+    val (data, error) = rememberSWRSubscription(
+        key = "/ws/feed",
+        subscribe = { key ->
+            callbackFlow {
+                val ws = WebSocket(key) { message ->
+                    trySend(message)
+                }
+                awaitClose { ws.close() }
+            }
+        },
+    )
+
+    if (error != null) {
+        Text("error: ${error.message}")
+    } else {
+        Text("latest: ${data ?: "..."}")
+    }
+}
+```
 
 ## Pagination / Infinite Loading
 
