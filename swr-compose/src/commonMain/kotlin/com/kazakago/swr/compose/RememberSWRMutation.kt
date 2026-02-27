@@ -8,6 +8,18 @@ import com.kazakago.swr.runtime.SWRMutation
 import com.kazakago.swr.runtime.SWRMutationConfig
 import com.kazakago.swr.store.persister.Persister
 
+/**
+ * Returns a [SWRMutationState] for manually triggering data mutation.
+ *
+ * Equivalent to React SWR's `useSWRMutation`. Unlike [rememberSWR], no fetch is triggered
+ * automatically; call [SWRMutationState.trigger] to initiate the mutation.
+ *
+ * @param key The cache key targeted by this mutation. Pass `null` to disable mutation.
+ * @param fetcher Suspending function that performs the mutation given a key and an argument.
+ * @param persister Optional persistence layer for cross-session caching.
+ * @param config Mutation-specific configuration options.
+ * @return [SWRMutationState] exposing [trigger][SWRMutationState.trigger], mutation state, and [reset][SWRMutationState.reset].
+ */
 @Composable
 public fun <KEY : Any, DATA, ARG> rememberSWRMutation(
     key: KEY?,

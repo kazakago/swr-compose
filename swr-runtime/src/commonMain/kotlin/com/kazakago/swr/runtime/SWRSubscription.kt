@@ -16,6 +16,18 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+/**
+ * Subscribes to a real-time data source and writes emitted values into the SWR cache.
+ *
+ * Equivalent to React SWR's `useSWRSubscription` hook logic.
+ * Used internally by [rememberSWRSubscription][com.kazakago.swr.compose.rememberSWRSubscription].
+ *
+ * @param key The cache key. Pass `null` to skip subscribing.
+ * @param scope CoroutineScope for collecting the subscription flow.
+ * @param persister Optional persistence layer for cross-session caching.
+ * @param cacheOwner Cache namespace. Defaults to [defaultSWRCacheOwner].
+ * @param subscribe Suspending function that returns a [Flow] of data for [key].
+ */
 public class SWRSubscription<KEY : Any, DATA>(
     private val key: KEY?,
     scope: CoroutineScope,
@@ -24,6 +36,8 @@ public class SWRSubscription<KEY : Any, DATA>(
     subscribe: suspend (key: KEY) -> Flow<DATA>,
 ) {
     private val _error: MutableStateFlow<Throwable?> = MutableStateFlow(null)
+
+    /** The error thrown by the subscription, or `null` if no error has occurred. */
     public val error: StateFlow<Throwable?> = _error.asStateFlow()
 
     private val sharedStore: SWRStore<KEY, DATA>? = if (key != null) {
@@ -35,6 +49,7 @@ public class SWRSubscription<KEY : Any, DATA>(
         )
     } else null
 
+    /** Flow of the current cache state for this subscription key. */
     public val stateFlow: StateFlow<SWRStoreState<DATA>> = sharedStore?.flow?.stateIn(
         scope = scope,
         started = SharingStarted.Eagerly,

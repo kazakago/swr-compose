@@ -18,6 +18,22 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 
+/**
+ * Runtime class for paginated and infinite-scroll data fetching.
+ *
+ * Manages multiple [SWRStore][com.kazakago.swr.store.SWRStore] instances — one per page —
+ * and combines their states into a single flow. Equivalent to React SWR's `useSWRInfinite` hook logic.
+ * Used internally by [rememberSWRInfinite][com.kazakago.swr.compose.rememberSWRInfinite].
+ *
+ * @param getKey Returns the cache key for a given page index and the previous page's data.
+ *               Return `null` to stop loading further pages.
+ * @param fetcher Suspending function that fetches data for a single page key.
+ * @param lifecycleOwner Lifecycle used to observe focus and background transitions.
+ * @param scope CoroutineScope for revalidation jobs.
+ * @param persister Optional persistence layer for cross-session caching.
+ * @param cacheOwner Cache namespace. Defaults to [defaultSWRCacheOwner].
+ * @param config Additional configuration options (e.g. [SWRConfig.initialSize], [SWRConfig.parallel]).
+ */
 public class SWRInfinite<KEY : Any, DATA>(
     getKey: (pageIndex: Int, previousPageData: DATA?) -> KEY?,
     fetcher: suspend (key: KEY) -> DATA,
@@ -110,8 +126,11 @@ public class SWRInfinite<KEY : Any, DATA>(
     }
 
     private val _stateFlow: MutableStateFlow<SWRStoreState<List<DATA?>>> = MutableStateFlow(SWRStoreState.initialize())
+
+    /** Flow of the combined state across all currently loaded pages. */
     public val stateFlow: StateFlow<SWRStoreState<List<DATA?>>> = _stateFlow.asStateFlow()
 
+    /** Handle for programmatically mutating the cache across all loaded pages. */
     public val mutate: SWRInfiniteMutate<DATA> = SWRInfiniteMutate(
         getSize = { pageSize.value },
         get = { index -> swrList[index]?.store?.get(GettingFrom.LocalOnly) ?: Result.failure(IllegalStateException("key is null")) },
@@ -119,10 +138,15 @@ public class SWRInfinite<KEY : Any, DATA>(
         update = { index, data -> swrList[index]?.store?.update(data) },
     )
 
+    /** Returns the current number of loaded pages. */
     public fun getSize(): Int {
         return pageSize.value
     }
 
+    /**
+     * Sets the number of pages to load.
+     * Increasing the size triggers additional page fetches; decreasing it removes trailing pages.
+     */
     public fun setSize(size: Int) {
         pageSize.value = size
     }

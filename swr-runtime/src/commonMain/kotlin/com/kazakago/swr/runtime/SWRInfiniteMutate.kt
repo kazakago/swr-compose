@@ -4,6 +4,13 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 
+/**
+ * Handle for programmatically mutating the SWR Infinite cache across all loaded pages.
+ *
+ * Obtained from [SWRInfiniteState.mutate][com.kazakago.swr.compose.SWRInfiniteState.mutate]
+ * or [SWRInfinite.mutate].
+ * Equivalent to the bound `mutate` function returned by React SWR's `useSWRInfinite`.
+ */
 public data class SWRInfiniteMutate<DATA>(
     private val getSize: suspend () -> Int,
     private val get: suspend (pageIndex: Int) -> Result<DATA?>,
@@ -11,6 +18,14 @@ public data class SWRInfiniteMutate<DATA>(
     private val update: suspend (pageIndex: Int, newData: DATA?) -> Unit,
 ) {
 
+    /**
+     * Mutates the cached data for all currently loaded pages.
+     *
+     * @param data Optional suspending function that returns the new list of page data.
+     *             If `null`, only a revalidation of all pages is triggered.
+     * @param config Mutation options such as optimistic updates, rollback on error, etc.
+     * @return The result of the mutation, wrapping the new page list or `null` if [data] was `null`.
+     */
     public suspend operator fun invoke(
         data: (suspend () -> List<DATA>)? = null,
         config: SWRMutateConfig<List<DATA>>.() -> Unit = {},

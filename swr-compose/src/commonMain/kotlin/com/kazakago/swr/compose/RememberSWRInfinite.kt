@@ -17,6 +17,21 @@ import com.kazakago.swr.store.persister.Persister
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.map
 
+/**
+ * Fetches paginated data, returning the result as Compose state.
+ *
+ * Equivalent to React SWR's `useSWRInfinite`. Load more pages by incrementing
+ * [SWRInfiniteState.size] via [SWRInfiniteState.setSize].
+ *
+ * @param getKey Returns the cache key for a page given its index and the previous page's data.
+ *               Return `null` to stop loading further pages.
+ * @param fetcher Suspending function that fetches data for a single page key.
+ * @param persister Optional persistence layer for cross-session caching.
+ * @param scope CoroutineScope for revalidation jobs. Defaults to the current composition scope.
+ * @param config Additional configuration options (e.g. [SWRConfig.initialSize], [SWRConfig.parallel]),
+ *               merged with [LocalSWRConfig].
+ * @return The current [SWRInfiniteState] as Compose state.
+ */
 @Composable
 public fun <KEY : Any, DATA> rememberSWRInfinite(
     getKey: (pageIndex: Int, previousPageData: DATA?) -> KEY?,

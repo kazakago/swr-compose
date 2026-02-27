@@ -14,6 +14,21 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
+/**
+ * Like [SWR], but disables all automatic revalidation after the initial fetch.
+ *
+ * Equivalent to React SWR's `useSWRImmutable`. Suitable for data that does not change,
+ * such as static configuration or user constants.
+ * Used internally by [rememberSWRImmutable][com.kazakago.swr.compose.rememberSWRImmutable].
+ *
+ * @param key The cache key. Pass `null` to suspend fetching.
+ * @param fetcher Suspending function that fetches data for [key].
+ * @param lifecycleOwner Lifecycle used to scope the initial fetch.
+ * @param scope CoroutineScope for the fetch job.
+ * @param persister Optional persistence layer for cross-session caching.
+ * @param cacheOwner Cache namespace. Defaults to [defaultSWRCacheOwner].
+ * @param config Additional configuration options, merged with [defaultConfig].
+ */
 public class SWRImmutable<KEY : Any, DATA>(
     key: KEY?,
     fetcher: suspend (key: KEY) -> DATA,
@@ -42,8 +57,10 @@ public class SWRImmutable<KEY : Any, DATA>(
         null
     }
 
+    /** Flow of the current cache state for this key. */
     public val stateFlow: StateFlow<SWRStoreState<DATA>> = swrInternal?.stateFlow ?: MutableStateFlow(SWRStoreState.initialize())
 
+    /** Handle for programmatically mutating the cache entry for this key. */
     public val mutate: SWRMutate<DATA> = if (swrInternal != null) {
         SWRMutate(
             get = swrInternal.store::get,

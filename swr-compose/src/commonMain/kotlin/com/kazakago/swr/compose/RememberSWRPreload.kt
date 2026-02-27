@@ -8,6 +8,20 @@ import com.kazakago.swr.runtime.SWRPreload
 import com.kazakago.swr.store.persister.Persister
 import kotlinx.coroutines.CoroutineScope
 
+/**
+ * Returns a [SWRPreload] that prefetches data for [key] on demand.
+ *
+ * Equivalent to React SWR's `preload`. The returned instance is a suspending operator
+ * function that, when invoked, fetches data and stores it in the cache without binding
+ * to the composable's lifecycle.
+ *
+ * @param key The cache key. Pass `null` to disable prefetching.
+ * @param fetcher Suspending function that fetches data for [key].
+ * @param persister Optional persistence layer for cross-session caching.
+ * @param scope CoroutineScope for the prefetch job. Defaults to the current composition scope.
+ * @param config Additional configuration options, merged with [LocalSWRConfig].
+ * @return A [SWRPreload] instance that can be invoked to trigger the prefetch.
+ */
 @Composable
 public fun <KEY : Any, DATA> rememberSWRPreload(
     key: KEY?,

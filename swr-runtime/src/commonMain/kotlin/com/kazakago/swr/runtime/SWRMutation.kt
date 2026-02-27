@@ -9,6 +9,19 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
+/**
+ * Provides manual data mutation with optimistic update support.
+ *
+ * Unlike [SWR], data fetching is not triggered automatically; call [trigger] to initiate a mutation.
+ * Equivalent to React SWR's `useSWRMutation` hook logic.
+ * Used internally by [rememberSWRMutation][com.kazakago.swr.compose.rememberSWRMutation].
+ *
+ * @param key The cache key targeted by this mutation. Pass `null` to disable mutation.
+ * @param fetcher Suspending function that performs the mutation given a key and an argument.
+ * @param persister Optional persistence layer for cross-session caching.
+ * @param cacheOwner Cache namespace. Defaults to [defaultSWRCacheOwner].
+ * @param config Mutation-specific configuration options.
+ */
 public class SWRMutation<KEY : Any, DATA, ARG>(
     private val key: KEY?,
     fetcher: suspend (key: KEY, arg: ARG) -> DATA,
@@ -20,8 +33,13 @@ public class SWRMutation<KEY : Any, DATA, ARG>(
     private val _data: MutableStateFlow<DATA?> = MutableStateFlow(null)
     private val _error: MutableStateFlow<Throwable?> = MutableStateFlow(null)
 
+    /** `true` while a mutation is in progress. */
     public val isMutating: StateFlow<Boolean> = _isMutating.asStateFlow()
+
+    /** The data returned by the last successful mutation, or `null` if none has occurred. */
     public val data: StateFlow<DATA?> = _data.asStateFlow()
+
+    /** The error thrown by the last failed mutation, or `null` if none has occurred. */
     public val error: StateFlow<Throwable?> = _error.asStateFlow()
 
     private val sharedStore: SWRStore<KEY, DATA>? = if (key != null) {
@@ -33,6 +51,7 @@ public class SWRMutation<KEY : Any, DATA, ARG>(
         )
     } else null
 
+    /** Call this to trigger the mutation. */
     public val trigger: SWRTrigger<KEY, DATA, ARG> = SWRTrigger { arg, overrideConfig ->
         val currentKey = key ?: return@SWRTrigger Result.failure(IllegalStateException("key is null"))
 
@@ -69,6 +88,7 @@ public class SWRMutation<KEY : Any, DATA, ARG>(
         }
     }
 
+    /** Resets [data], [error], and [isMutating] to their initial values. */
     public fun reset() {
         _isMutating.value = false
         _data.value = null
