@@ -2,7 +2,7 @@ name: Check
 
 on:
   push:
-    branches: [ main, production ]
+    branches: [ main ]
   pull_request:
   workflow_dispatch:
 
@@ -59,4 +59,4 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v5
 
-      - run: ./gradlew exampleApp:compileKotlinJvm
+      - run: ./gradlew example:compileKotlinJvm

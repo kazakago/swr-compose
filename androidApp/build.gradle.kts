@@ -1,5 +1,7 @@
 plugins {
     alias(libs.plugins.androidApplication)
+    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.composeCompiler)
 }
 
 android {
@@ -25,5 +27,6 @@ android {
 }
 
 dependencies {
-    implementation(projects.exampleApp)
+    implementation(projects.example)
+    implementation(libs.androidxActivityCompose)
 }

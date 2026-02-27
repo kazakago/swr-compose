@@ -17,10 +17,10 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v5
 
-      - run: ./gradlew exampleApp:wasmJsBrowserDistribution
+      - run: ./gradlew webApp:wasmJsBrowserDistribution
 
       - uses: actions/upload-pages-artifact@v4
         with:
-          path: exampleApp/build/dist/wasmJs/productionExecutable
+          path: webApp/build/dist/wasmJs/productionExecutable
 
       - uses: actions/deploy-pages@v4
