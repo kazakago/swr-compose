@@ -19,7 +19,7 @@ swr-store     (Pure data caching — SWRStore, DataSelector, SWRStoreState)
 ```
 
 - **swr-store**: Stateless cache layer. Manages data storage, state transitions (`Loading`/`Completed`/`Error`), and persistence. No lifecycle or platform dependencies.
-- **swr-runtime**: Orchestration layer. Adds lifecycle monitoring, network status awareness, automatic revalidation (on focus, reconnect, interval), error retry, and deduplication. Contains platform-specific `expect/actual` implementations for `NetworkMonitor`.
+- **swr-runtime**: Orchestration layer. Adds lifecycle monitoring, network status awareness, automatic revalidation (on focus, reconnect, interval), error retry, and deduplication. Also provides `SWRSubscription` for real-time data sources. Contains platform-specific `expect/actual` implementations for `NetworkMonitor`.
 - **swr-compose**: Thin Compose wrapper. Converts runtime flows into Compose state via `rememberSWR` family of functions. Provides `CompositionLocal` for global configuration (`LocalSWRConfig`, `LocalSWRCacheOwner`).
 
 Other modules:
@@ -35,6 +35,7 @@ Other modules:
 | `rememberSWRInfinite` | Paginated/infinite list fetching |
 | `rememberSWRImmutable` | Fetch once, never revalidate |
 | `rememberSWRPreload` | Prefetch data without lifecycle binding |
+| `rememberSWRSubscription` | Subscribe to real-time data sources (WebSocket, SSE, etc.) with SWR cache integration |
 | `SWRConfig` | Global/scoped configuration via CompositionLocal |
 
 ## Key Design Patterns
@@ -45,6 +46,7 @@ Other modules:
 - **`expect`/`actual` for platform code**: Network monitoring has platform-specific implementations (ConnectivityManager on Android, NWPathMonitor on iOS, NetworkInterface polling on JVM).
 - **`@Immutable` state holders**: All Compose state classes are annotated `@Immutable` for recomposition optimization.
 - **`internal` visibility for implementation**: Implementation details (`DataSelector`, `SWRInternal`, `SWRValidate`, `DataState`) are `internal`. Public API surface is minimal.
+- **Subscription lifecycle**: `rememberSWRSubscription` uses `SideEffect` (not `DisposableEffect`) to cancel the previous subscription only on key change — NOT when the composable leaves composition. This allows an external `scope` (e.g. `viewModelScope`) to keep the subscription alive across screen transitions. The `subscribe` lambda returns a `Flow<DATA>`; the library collects it internally and writes emitted values to the shared `SWRStore` cache.
 
 ## React SWR Reference
 
@@ -52,6 +54,7 @@ This library mirrors [React SWR's API](https://swr.vercel.app/docs/api). When ad
 - `useSWR` → `rememberSWR`
 - `useSWRMutation` → `rememberSWRMutation`
 - `useSWRInfinite` → `rememberSWRInfinite`
+- `useSWRSubscription` → `rememberSWRSubscription`
 - `SWRConfig` provider → `LocalSWRConfig` CompositionLocal
 - Config options (`revalidateOnFocus`, `dedupingInterval`, `errorRetryCount`, etc.) match React SWR naming.
 
@@ -134,3 +137,8 @@ fun test() = runTest {
 - State transitions: Loading → Completed, Loading → Error
 - Mutation scenarios: optimistic updates, populateCache, rollback on error
 - Pagination: page size changes, revalidation strategies
+- Subscription scenarios: data received updates cache, error state, cancel stops collection, `key = null` skips subscription, shared cache integration with `SWRStore`
+
+## Subscription-specific test notes
+- Use `backgroundScope` (not `this`) when creating `SWRSubscription` in tests. `stateIn(SharingStarted.Eagerly)` keeps a coroutine running until the scope is cancelled; using `this` (TestScope) causes `UncompletedCoroutinesError` at the end of `runTest`.
+- Use `Channel<T>` + `receiveAsFlow()` to control emissions from tests.
