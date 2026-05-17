@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: gradle/actions/setup-gradle@v5
+      - uses: gradle/actions/setup-gradle@v6
 
       - run: ./gradlew webApp:wasmJsBrowserDistribution
 
@@ -23,4 +23,4 @@ jobs:
         with:
           path: webApp/build/dist/wasmJs/productionExecutable
 
-      - uses: actions/deploy-pages@v4
+      - uses: actions/deploy-pages@v5
