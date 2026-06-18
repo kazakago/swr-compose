@@ -10,7 +10,7 @@ jobs:
   test-jvm:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: gradle/actions/setup-gradle@v6
 
@@ -19,7 +19,7 @@ jobs:
   test-android:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: gradle/actions/setup-gradle@v6
 
@@ -28,7 +28,7 @@ jobs:
   test-ios:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: gradle/actions/setup-gradle@v6
 
@@ -37,7 +37,7 @@ jobs:
   test-wasmJs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: gradle/actions/setup-gradle@v6
 
@@ -46,7 +46,7 @@ jobs:
   test-js:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: gradle/actions/setup-gradle@v6
 
@@ -55,7 +55,7 @@ jobs:
   build-example:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: gradle/actions/setup-gradle@v6
 
