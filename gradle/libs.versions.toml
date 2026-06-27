@@ -1,14 +1,14 @@
 [versions]
-kotlin = "2.3.21" # https://kotlinlang.org/docs/multiplatform-compatibility-guide.html#version-compatibility
+kotlin = "2.4.0" # https://kotlinlang.org/docs/multiplatform-compatibility-guide.html#version-compatibility
 kotlinxCoroutines = "1.11.0"
 kotlinxSerialization = "1.11.0"
 kotlinxBrowser = "0.5.0"
 kotlinxDatetime = "0.8.0"
-composeMultiplatform = "1.11.0" # https://github.com/JetBrains/compose-multiplatform/releases
+composeMultiplatform = "1.11.1" # https://github.com/JetBrains/compose-multiplatform/releases
 composeMaterial3 = "1.11.0-alpha07"
 jetbrainsNavigation3 = "1.1.1"
-jetbrainsLifecycle = "2.11.0-beta01"
-androidxLifecycle = "2.10.0"
+jetbrainsLifecycle = "2.11.0-beta02"
+androidxLifecycle = "2.11.0"
 androidxStartup = "1.2.0"
 androidxActivity = "1.13.0"
 turbine = "1.2.1"
@@ -18,7 +18,7 @@ androidPlugin = "9.2.1"
 androidCompileSdk = "37"
 androidMinSdk = "23"
 androidTargetSdk = "37"
-mavenPublish = "0.36.0"
+mavenPublish = "0.37.0"
 
 [libraries]
 kotlinPlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
