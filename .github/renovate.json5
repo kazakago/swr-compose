@@ -2,13 +2,15 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended",
-    "helpers:pinGitHubActionDigests"
+    "helpers:pinGitHubActionDigests",
   ],
-  "ignoreDeps": ["buildlogic.publish"],
+  "ignoreDeps": [
+    "buildlogic.publish",
+  ],
   "packageRules": [
     {
       "matchPackageNames": ["org.jetbrains.kotlinx:kotlinx-datetime"],
-      "allowedVersions": "!/\\-compat$/"
-    }
-  ]
+      "allowedVersions": "!/\\-compat$/",
+    },
+  ],
 }
