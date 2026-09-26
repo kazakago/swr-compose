@@ -1,7 +1,7 @@
 [versions]
 jvm-toolchain = "21"
 jvm-target = "17"
-kotlin = "2.4.10" # https://kotlinlang.org/docs/multiplatform-compatibility-guide.html#version-compatibility
+kotlin = "2.4.20" # https://kotlinlang.org/docs/multiplatform-compatibility-guide.html#version-compatibility
 kotlinx-coroutines = "1.11.0"
 kotlinx-serialization = "1.11.0"
 kotlinx-browser = "0.5.0"
