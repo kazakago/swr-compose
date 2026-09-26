@@ -34,7 +34,5 @@
       "Read(**/build/resources/**)",
       "Read(**/build/tmp/**)"
     ]
-  },
-  "respectGitignore": true,
-  "plansDirectory": ".claude/plans"
+  }
 }
