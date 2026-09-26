@@ -1,3 +1,7 @@
+---
+trigger: always_on
+---
+
 # Writing Rules for Public-Facing Content
 
 All text written to publicly visible locations must be in English.
